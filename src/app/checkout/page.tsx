@@ -67,7 +67,7 @@ const STEPS = [
 
 function StepIndicator({ current }: { current: number }) {
   return (
-    <ol className="flex items-center w-full mb-10" aria-label="Checkout progress">
+    <ol className="flex items-center w-full mb-0" aria-label="Checkout progress">
       {STEPS.map((step, i) => {
         const isDone = current > step.id;
         const isActive = current === step.id;
