@@ -56,7 +56,7 @@ export function ProductCard({ product, index = 0 }: ProductCardProps) {
               </Badge>
             )}
             {product.discountPercent && (
-              <Badge variant="destructive" className="border-0">
+              <Badge variant="secondary" className="border-0">
                 -{product.discountPercent}%
               </Badge>
             )}
@@ -106,11 +106,11 @@ export function ProductCard({ product, index = 0 }: ProductCardProps) {
 
           <div className="mt-auto flex items-center gap-2 pt-2">
             <span className="text-lg font-bold text-foreground">
-              {formatPrice(product.price, product.currency)}
+              {formatPrice(product.price)}
             </span>
             {product.compareAtPrice && (
               <span className="text-sm text-muted-foreground line-through">
-                {formatPrice(product.compareAtPrice, product.currency)}
+                {formatPrice(product.compareAtPrice)}
               </span>
             )}
           </div>

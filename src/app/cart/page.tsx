@@ -142,7 +142,7 @@ export default function CartPage() {
                       </div>
 
                       <span className="font-semibold text-foreground">
-                        {formatPrice(lineTotal, item.product.currency)}
+                        {formatPrice(lineTotal)}
                       </span>
                     </div>
                   </div>
@@ -165,7 +165,7 @@ export default function CartPage() {
             <div className="flex justify-between text-muted-foreground">
               <span>Subtotal</span>
               <span className="text-foreground font-medium">
-                {formatPrice(subtotal, "USD")}
+                {formatPrice(subtotal)}
               </span>
             </div>
             <div className="flex justify-between text-muted-foreground">
@@ -176,12 +176,12 @@ export default function CartPage() {
                   shipping === 0 ? "text-primary" : "text-foreground"
                 )}
               >
-                {shipping === 0 ? "Free" : formatPrice(shipping, "USD")}
+                {shipping === 0 ? "Free" : formatPrice(shipping)}
               </span>
             </div>
             {shipping > 0 && (
               <p className="text-xs text-muted-foreground">
-                Add {formatPrice(FREE_SHIPPING_THRESHOLD - subtotal, "USD")} more for free shipping.
+                Add {formatPrice(FREE_SHIPPING_THRESHOLD - subtotal)} more for free shipping.
               </p>
             )}
           </div>
@@ -191,7 +191,7 @@ export default function CartPage() {
           <div className="flex justify-between items-center mb-6">
             <span className="font-semibold text-foreground">Total</span>
             <span className="text-2xl font-bold text-foreground">
-              {formatPrice(total, "USD")}
+              {formatPrice(total)}
             </span>
           </div>
 
