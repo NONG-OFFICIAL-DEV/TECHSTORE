@@ -12,14 +12,14 @@ import {
   QrCode,
   ShieldCheck,
   CheckCircle2,
-  MapPin,
-  LoaderCircle,
   Check,
+  AlertCircle,
 } from "lucide-react";
 import { useCart } from "@/hooks/use-cart";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Breadcrumb } from "@/components/shared/breadcrumb";
+import { LocationLinkInput } from "@/components/checkout/location-link-input";
 import { cn, formatPrice } from "@/lib/utils";
 
 // ------------------------------------------------------------------
@@ -116,6 +116,19 @@ const stepVariants = {
   exit: (dir: number) => ({ opacity: 0, x: dir > 0 ? -24 : 24 }),
 };
 
+// Reusable, responsive inline error banner.
+function StepErrorBanner({ message }: { message: string }) {
+  return (
+    <div
+      role="alert"
+      className="flex items-start gap-2.5 rounded-xl border border-destructive/40 bg-destructive/5 px-4 py-3 text-sm text-destructive"
+    >
+      <AlertCircle className="h-4 w-4 shrink-0 mt-0.5" />
+      <span className="break-words leading-relaxed">{message}</span>
+    </div>
+  );
+}
+
 export default function CheckoutPage() {
   const items = useCart((state) => state.items);
   const subtotal = useCart((state) => state.totalPrice());
@@ -133,10 +146,8 @@ export default function CheckoutPage() {
   // Delivery region
   const [location, setLocation] = useState<DeliveryRegion>(LOCATION_PHNOM_PENH);
 
-  // Phnom Penh: shared GPS location
+  // Phnom Penh: location pasted in via a Google Maps share link
   const [coords, setCoords] = useState<{ lat: number; lng: number } | null>(null);
-  const [locating, setLocating] = useState(false);
-  const [locationError, setLocationError] = useState<string | null>(null);
 
   // Province: cascading province -> district -> courier
   const [selectedProvince, setSelectedProvince] = useState<string>("");
@@ -166,26 +177,6 @@ export default function CheckoutPage() {
     setStepError(null);
   };
 
-  const handleShareLocation = () => {
-    if (!navigator.geolocation) {
-      setLocationError("Your browser doesn't support location sharing — please enter your address manually.");
-      return;
-    }
-    setLocating(true);
-    setLocationError(null);
-    navigator.geolocation.getCurrentPosition(
-      (pos) => {
-        setCoords({ lat: pos.coords.latitude, lng: pos.coords.longitude });
-        setLocating(false);
-      },
-      () => {
-        setLocationError("Couldn't get your location — check permissions, or enter your address manually below.");
-        setLocating(false);
-      },
-      { enableHighAccuracy: true, timeout: 10000 }
-    );
-  };
-
   const total = subtotal + selectedShipping.cost;
 
   const goToStep = (next: number) => {
@@ -200,7 +191,7 @@ export default function CheckoutPage() {
       return;
     }
     if (location === "phnom_penh" && !coords && !address.trim()) {
-      setStepError("Share your location or type your address so the rider can find you.");
+      setStepError("Paste your Google Maps link or type your address so the rider can find you.");
       return;
     }
     if (location === "province" && !selectedProvince) {
@@ -341,63 +332,17 @@ export default function CheckoutPage() {
                       </div>
                     </div>
 
-                    {/* Phnom Penh: share GPS location */}
+                    {/* Phnom Penh: paste a Google Maps share link */}
                     {location === LOCATION_PHNOM_PENH && (
                       <div className="col-span-2 mt-2">
                         <label className="text-xs font-medium text-muted-foreground block mb-2">
-                          Pin Your Location
+                          Share Your Location
                         </label>
-                        {!coords ? (
-                          <button
-                            type="button"
-                            onClick={handleShareLocation}
-                            disabled={locating}
-                            className={cn(
-                              "w-full flex items-center justify-center gap-2 rounded-xl border border-dashed border-primary/40 py-3 text-sm font-medium text-primary transition-colors",
-                              "hover:bg-primary/5 disabled:opacity-60"
-                            )}
-                          >
-                            {locating ? (
-                              <>
-                                <LoaderCircle className="h-4 w-4 animate-spin" /> Getting your location…
-                              </>
-                            ) : (
-                              <>
-                                <MapPin className="h-4 w-4" /> Share My Location
-                              </>
-                            )}
-                          </button>
-                        ) : (
-                          <div className="flex items-center justify-between rounded-xl border border-emerald-500/30 bg-emerald-500/5 px-4 py-3">
-                            <div className="flex items-center gap-2 text-sm text-emerald-500 font-medium">
-                              <CheckCircle2 className="h-4 w-4" /> Location captured
-                            </div>
-                            <div className="flex items-center gap-3">
-                              <a
-                                href={`https://www.google.com/maps?q=${coords.lat},${coords.lng}`}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="text-xs font-medium text-primary underline underline-offset-2"
-                              >
-                                View on map
-                              </a>
-                              <button
-                                type="button"
-                                onClick={() => setCoords(null)}
-                                className="text-xs text-muted-foreground hover:text-foreground"
-                              >
-                                Reset
-                              </button>
-                            </div>
-                          </div>
-                        )}
-                        {locationError && (
-                          <p className="mt-2 text-xs text-destructive">{locationError}</p>
-                        )}
+                        <LocationLinkInput value={coords} onChange={setCoords} />
                         <p className="mt-2 text-xs text-muted-foreground">
                           {coords
-                            ? "Rider will navigate directly to your pin. You can still add landmark notes below."
-                            : "Fastest option for Grab/J&T riders — or type your address below instead."}
+                            ? "Rider will navigate directly to this pin. You can still add landmark notes below."
+                            : "Fastest way for Grab/J&T riders to find you — or type your address below instead."}
                         </p>
                       </div>
                     )}
@@ -491,24 +436,24 @@ export default function CheckoutPage() {
                           key={method.id}
                           onClick={() => setSelectedShipping(method)}
                           className={cn(
-                            "flex items-center justify-between p-3.5 rounded-xl border cursor-pointer transition-all",
+                            "flex items-center justify-between gap-3 p-3.5 rounded-xl border cursor-pointer transition-all",
                             selectedShipping.id === method.id
                               ? "border-primary bg-primary/5"
                               : "border-border/70 hover:bg-muted/20"
                           )}
                         >
-                          <div>
-                            <p className="text-sm font-semibold">{method.name}</p>
+                          <div className="min-w-0">
+                            <p className="text-sm font-semibold truncate">{method.name}</p>
                             <p className="text-xs text-muted-foreground mt-0.5">{method.desc}</p>
                           </div>
-                          <span className="text-sm font-bold">{formatPrice(method.cost)}</span>
+                          <span className="text-sm font-bold shrink-0">{formatPrice(method.cost)}</span>
                         </div>
                       ))}
                     </div>
                   </motion.div>
                 )}
 
-                {stepError && <p className="text-sm text-destructive -mt-2">{stepError}</p>}
+                {stepError && <StepErrorBanner message={stepError} />}
 
                 <Button type="button" size="lg" onClick={handleNextFromDelivery} className="w-full h-12 text-base">
                   Continue to Review &amp; Payment <ArrowRight className="h-4 w-4" />
@@ -534,15 +479,15 @@ export default function CheckoutPage() {
                     <Truck className="h-5 w-5 text-primary" /> Delivery Summary
                   </h2>
 
-                  <div className="grid grid-cols-2 gap-y-3 text-sm">
+                  <div className="grid grid-cols-2 gap-x-3 gap-y-3 text-sm">
                     <span className="text-muted-foreground">Name</span>
-                    <span className="text-right font-medium">{fullName}</span>
+                    <span className="text-right font-medium truncate">{fullName}</span>
 
                     <span className="text-muted-foreground">Phone</span>
-                    <span className="text-right font-medium">{phone}</span>
+                    <span className="text-right font-medium truncate">{phone}</span>
 
                     <span className="text-muted-foreground">Region</span>
-                    <span className="text-right font-medium">
+                    <span className="text-right font-medium truncate">
                       {location === LOCATION_PHNOM_PENH
                         ? "Phnom Penh"
                         : `${selectedDistrict}, ${selectedProvince}`}
@@ -565,13 +510,13 @@ export default function CheckoutPage() {
                     )}
 
                     <span className="text-muted-foreground">Delivery company</span>
-                    <span className="text-right font-medium">{selectedShipping.name}</span>
+                    <span className="text-right font-medium truncate">{selectedShipping.name}</span>
                   </div>
 
                   {address && (
                     <div className="pt-2 border-t border-border/60">
                       <p className="text-xs text-muted-foreground mb-1">Address notes</p>
-                      <p className="text-sm">{address}</p>
+                      <p className="text-sm break-words">{address}</p>
                     </div>
                   )}
 
@@ -590,30 +535,34 @@ export default function CheckoutPage() {
                     <Landmark className="h-5 w-5 text-primary" /> Payment Method
                   </h2>
 
-                  <div className="grid grid-cols-2 gap-3 mb-6">
+                  <div className="grid grid-cols-2 gap-2 sm:gap-3 mb-6">
                     <div
                       onClick={() => setPaymentMethod("khqr")}
                       className={cn(
-                        "flex flex-col items-center gap-2 p-4 rounded-xl border cursor-pointer text-center transition-all",
+                        "flex flex-col items-center gap-2 p-3 sm:p-4 rounded-xl border cursor-pointer text-center transition-all",
                         paymentMethod === "khqr"
                           ? "border-primary bg-primary/5 text-primary"
                           : "border-border text-muted-foreground hover:text-foreground"
                       )}
                     >
                       <QrCode className="h-6 w-6" />
-                      <span className="text-xs font-bold uppercase tracking-wider">Bakong KHQR</span>
+                      <span className="text-[11px] sm:text-xs font-bold uppercase tracking-wider">
+                        Bakong KHQR
+                      </span>
                     </div>
                     <div
                       onClick={() => setPaymentMethod("aba")}
                       className={cn(
-                        "flex flex-col items-center gap-2 p-4 rounded-xl border cursor-pointer text-center transition-all",
+                        "flex flex-col items-center gap-2 p-3 sm:p-4 rounded-xl border cursor-pointer text-center transition-all",
                         paymentMethod === "aba"
                           ? "border-primary bg-primary/5 text-primary"
                           : "border-border text-muted-foreground hover:text-foreground"
                       )}
                     >
                       <Landmark className="h-6 w-6" />
-                      <span className="text-xs font-bold uppercase tracking-wider">ABA Mobile Bank</span>
+                      <span className="text-[11px] sm:text-xs font-bold uppercase tracking-wider">
+                        ABA Mobile Bank
+                      </span>
                     </div>
                   </div>
 
@@ -621,11 +570,11 @@ export default function CheckoutPage() {
                     {paymentMethod === "khqr" ? (
                       <>
                         <div className="bg-white p-3 rounded-xl border mb-3 shadow-sm">
-                          <div className="w-40 h-40 bg-gradient-to-br from-red-500 to-red-700 flex items-center justify-center text-white rounded-lg font-mono font-bold text-lg">
+                          <div className="w-36 h-36 sm:w-40 sm:h-40 bg-gradient-to-br from-red-500 to-red-700 flex items-center justify-center text-white rounded-lg font-mono font-bold text-lg">
                             KHQR DUMMY
                           </div>
                         </div>
-                        <p className="text-xs text-muted-foreground max-w-xs">
+                        <p className="text-xs text-muted-foreground max-w-xs break-words">
                           Scan using Bakong or any Cambodian Banking App to auto-pay{" "}
                           <span className="font-semibold text-foreground">{formatPrice(total)}</span>
                         </p>
@@ -636,10 +585,10 @@ export default function CheckoutPage() {
                           Our Official Bank Account
                         </p>
                         <div className="p-3 bg-background border rounded-lg">
-                          <p className="text-sm font-bold text-foreground">ABA Bank (000 123 456)</p>
-                          <p className="text-xs text-muted-foreground mt-0.5">Account Name: NOVA COMMERCE CO., LTD.</p>
+                          <p className="text-sm font-bold text-foreground break-words">ABA Bank (000 123 456)</p>
+                          <p className="text-xs text-muted-foreground mt-0.5 break-words">Account Name: NOVA COMMERCE CO., LTD.</p>
                         </div>
-                        <p className="text-xs text-muted-foreground pt-1">
+                        <p className="text-xs text-muted-foreground pt-1 break-words">
                           Please transfer exactly{" "}
                           <span className="font-semibold text-foreground">{formatPrice(total)}</span> into the account
                           above.
@@ -649,17 +598,19 @@ export default function CheckoutPage() {
                   </div>
                 </div>
 
-                <div className="flex gap-3">
-                  <Button type="button" variant="outline" size="lg" onClick={() => goToStep(1)} className="flex-1 h-12">
+                {stepError && <StepErrorBanner message={stepError} />}
+
+                <div className="flex flex-col gap-3 sm:flex-row">
+                  <Button type="button" variant="outline" size="lg" onClick={() => goToStep(1)} className="w-full sm:flex-1 h-12">
                     <ArrowLeft className="h-4 w-4" /> Back
                   </Button>
-                  <Button type="submit" size="lg" disabled={isSubmitting} className="flex-1 h-12 text-base">
+                  <Button type="submit" size="lg" disabled={isSubmitting} className="w-full sm:flex-1 h-12 text-base">
                     {isSubmitting ? "Registering order..." : "Confirm & Complete Order"}
                   </Button>
                 </div>
 
-                <p className="flex items-center justify-center gap-1 text-xs text-muted-foreground">
-                  <ShieldCheck className="h-3.5 w-3.5 text-emerald-500" /> Direct encrypted verification logic.
+                <p className="flex items-center justify-center gap-1 text-xs text-muted-foreground text-center">
+                  <ShieldCheck className="h-3.5 w-3.5 text-emerald-500 shrink-0" /> Direct encrypted verification logic.
                 </p>
               </motion.div>
             )}
@@ -681,7 +632,7 @@ export default function CheckoutPage() {
                     <h4 className="font-medium text-foreground line-clamp-1">{item.product.name}</h4>
                     <p className="text-xs text-muted-foreground">Qty: {item.quantity}</p>
                   </div>
-                  <span className="text-sm font-semibold">{formatPrice(item.product.price * item.quantity)}</span>
+                  <span className="text-sm font-semibold shrink-0">{formatPrice(item.product.price * item.quantity)}</span>
                 </div>
               ))}
             </div>
@@ -689,21 +640,21 @@ export default function CheckoutPage() {
             <Separator className="my-4" />
 
             <div className="flex flex-col gap-2 text-sm">
-              <div className="flex justify-between text-muted-foreground">
+              <div className="flex justify-between gap-2 text-muted-foreground">
                 <span>Subtotal</span>
-                <span className="text-foreground font-medium">{formatPrice(subtotal)}</span>
+                <span className="text-foreground font-medium shrink-0">{formatPrice(subtotal)}</span>
               </div>
-              <div className="flex justify-between text-muted-foreground">
-                <span>Delivery Via ({selectedShipping.name})</span>
-                <span className="text-foreground font-medium">{formatPrice(selectedShipping.cost)}</span>
+              <div className="flex justify-between items-baseline gap-2 text-muted-foreground">
+                <span className="truncate">Delivery Via ({selectedShipping.name})</span>
+                <span className="text-foreground font-medium shrink-0">{formatPrice(selectedShipping.cost)}</span>
               </div>
             </div>
 
             <Separator className="my-4" />
 
-            <div className="flex justify-between items-center">
+            <div className="flex justify-between items-center gap-2">
               <span className="font-semibold">Total to Pay</span>
-              <span className="text-2xl font-bold text-primary">{formatPrice(total)}</span>
+              <span className="text-2xl font-bold text-primary shrink-0">{formatPrice(total)}</span>
             </div>
           </div>
         </div>
