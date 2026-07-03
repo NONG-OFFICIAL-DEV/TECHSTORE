@@ -12,15 +12,18 @@ import { Breadcrumb } from "@/components/shared/breadcrumb";
 import { cn, formatPrice } from "@/lib/utils";
 
 // Cambodian logistics constants
-const LOCATION_PHNOM_PENH = "phnom_penh";
-const LOCATION_PROVINCE = "province";
+type DeliveryRegion = "phnom_penh" | "province";
 
-const SHIPPING_METHODS = {
-  [LOCATION_PHNOM_PENH]: [
+const LOCATION_PHNOM_PENH: DeliveryRegion = "phnom_penh";
+const LOCATION_PROVINCE: DeliveryRegion = "province";
+
+// 2. Add an explicit Record type signature to the logistics object
+const SHIPPING_METHODS: Record<DeliveryRegion, { id: string; name: string; desc: string; cost: number; }[]> = {
+  phnom_penh: [
     { id: "grab", name: "Grab Express", desc: "Instant bike delivery within PP", cost: 2.5 },
     { id: "jnt_pp", name: "J&T Express (Phnom Penh)", desc: "Next day delivery", cost: 1.5 },
   ],
-  [LOCATION_PROVINCE]: [
+  province: [
     { id: "vet", name: "Vireak Buntham (VET)", desc: "1-2 days to bus station/home", cost: 3.0 },
     { id: "jnt_prov", name: "J&T Express (Province)", desc: "1-3 days to doorstep", cost: 2.5 },
   ],
@@ -39,10 +42,10 @@ export default function CheckoutPage() {
   const [isOrdered, setIsOrdered] = useState(false);
 
   // Handle shifting shipping methods when changing location type
-  const handleLocationChange = (loc: string) => {
+    const handleLocationChange = (loc: DeliveryRegion) => {
     setLocation(loc);
     setSelectedShipping(SHIPPING_METHODS[loc][0]);
-  };
+    };
 
   const total = subtotal + selectedShipping.cost;
 
