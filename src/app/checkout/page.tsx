@@ -110,30 +110,30 @@ export default function CheckoutPage() {
             
             <div className="grid grid-cols-2 gap-4">
               <div className="col-span-2">
-                <label className="text-xs font-medium text-muted-foreground">Full Name / ឈ្មោះ</label>
+                <label className="text-xs font-medium text-muted-foreground">Full Name</label>
                 <input required type="text" placeholder="e.g. Sok Chan" className="mt-1 w-full rounded-xl border border-border bg-background px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20" />
               </div>
               <div className="col-span-2">
-                <label className="text-xs font-medium text-muted-foreground">Phone Number / លេខទូរស័ព្ទ (Telegram)</label>
+                <label className="text-xs font-medium text-muted-foreground">Phone Number (Telegram)</label>
                 <input required type="tel" placeholder="e.g. 092 123 456" className="mt-1 w-full rounded-xl border border-border bg-background px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20" />
               </div>
 
               {/* Destination Sector Toggle */}
               <div className="col-span-2 mt-2">
-                <label className="text-xs font-medium text-muted-foreground block mb-2">Delivery Region / តំបន់ដឹកជញ្ជូន</label>
+                <label className="text-xs font-medium text-muted-foreground block mb-2">Delivery Region</label>
                 <div className="grid grid-cols-2 gap-3">
                   <button type="button" onClick={() => handleLocationChange(LOCATION_PHNOM_PENH)} className={cn("p-3 rounded-xl border text-left text-sm font-medium transition-all", location === LOCATION_PHNOM_PENH ? "border-primary bg-primary/5 text-primary" : "border-border hover:bg-muted/30")}>
-                    Phnom Penh (ភ្នំពេញ)
+                    Phnom Penh
                   </button>
                   <button type="button" onClick={() => handleLocationChange(LOCATION_PROVINCE)} className={cn("p-3 rounded-xl border text-left text-sm font-medium transition-all", location === LOCATION_PROVINCE ? "border-primary bg-primary/5 text-primary" : "border-border hover:bg-muted/30")}>
-                    Provinces (តាមខេត្ត)
+                    Provinces
                   </button>
                 </div>
               </div>
 
               {/* Dynamic Carriers Mapping */}
               <div className="col-span-2 mt-2">
-                <label className="text-xs font-medium text-muted-foreground block mb-2">Select Delivery Company / ជ្រើសរើសក្រុមហ៊ុនដឹកជញ្ជូន</label>
+                <label className="text-xs font-medium text-muted-foreground block mb-2">Select Delivery Company </label>
                 <div className="flex flex-col gap-2.5">
                   {SHIPPING_METHODS[location].map((method) => (
                     <div key={method.id} onClick={() => setSelectedShipping(method)} className={cn("flex items-center justify-between p-3.5 rounded-xl border cursor-pointer transition-all", selectedShipping.id === method.id ? "border-primary bg-primary/5" : "border-border/70 hover:bg-muted/20")}>
@@ -148,7 +148,7 @@ export default function CheckoutPage() {
               </div>
 
               <div className="col-span-2">
-                <label className="text-xs font-medium text-muted-foreground">Drop-off Address Details / អាសយដ្ឋានលម្អិត</label>
+                <label className="text-xs font-medium text-muted-foreground">Drop-off Address Details </label>
                 <textarea required rows={3} placeholder="House number, Street name, Sangkat or Province/District details..." className="mt-1 w-full rounded-xl border border-border bg-background px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 resize-none" />
               </div>
             </div>
@@ -157,7 +157,7 @@ export default function CheckoutPage() {
           {/* Cambodia Payment Engine */}
           <div className="rounded-2xl border border-border/60 bg-card/40 backdrop-blur-sm p-6">
             <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
-              <Landmark className="h-5 w-5 text-primary" /> Payment Method / វិធីទូទាត់ប្រាក់
+              <Landmark className="h-5 w-5 text-primary" /> Payment Method
             </h2>
 
             <div className="grid grid-cols-2 gap-3 mb-6">

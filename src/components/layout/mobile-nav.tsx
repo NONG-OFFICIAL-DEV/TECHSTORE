@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion } from "framer-motion";
@@ -24,6 +25,13 @@ const BOTTOM_NAV_ITEMS: BottomNavItem[] = [
 export function MobileNav() {
   const pathname = usePathname();
   const totalItems = useCart((state) => state.totalItems());
+  
+  // Track mount status to delay reading local cart data during SSR
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   return (
     <nav
@@ -60,7 +68,8 @@ export function MobileNav() {
                     className={cn("h-5 w-5", active && "text-primary")}
                     strokeWidth={active ? 2.25 : 1.75}
                   />
-                  {item.href === "/cart" && totalItems > 0 && (
+                  {/* FIXED: added isMounted safety check to eliminate hydration warnings */}
+                  {item.href === "/cart" && isMounted && totalItems > 0 && (
                     <span className="absolute -right-2 -top-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[9px] font-mono font-medium text-primary-foreground">
                       {totalItems > 9 ? "9+" : totalItems}
                     </span>

@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Space_Grotesk, Inter, JetBrains_Mono } from "next/font/google";
 import { Navbar } from "@/components/layout/navbar";
 import { MobileNav } from "@/components/layout/mobile-nav";
@@ -30,6 +30,14 @@ export const metadata: Metadata = {
   },
   description:
     "Engineered gadgets, chosen for how they're built, not just what they do.",
+};
+
+// NOTE: intentionally NOT setting maximumScale or userScalable: false.
+// Doing so blocks pinch-zoom entirely, which fails WCAG 1.4.4 (Resize Text)
+// and is worse for mobile users than the accidental-zoom bugs it "fixes".
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
 };
 
 export default function RootLayout({
