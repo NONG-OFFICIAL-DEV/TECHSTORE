@@ -195,8 +195,10 @@ export default function CartPage() {
             </span>
           </div>
 
-          <Button size="lg" className="w-full gap-2">
-            Checkout <ArrowRight className="h-4 w-4" />
+          <Button size="lg" className="w-full gap-2" asChild>
+            <Link href="/checkout">
+              Proceed to Checkout <ArrowRight className="h-4 w-4" />
+            </Link>
           </Button>
 
           <Button variant="ghost" size="sm" asChild className="w-full mt-2">
