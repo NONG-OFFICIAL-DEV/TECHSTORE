@@ -8,7 +8,7 @@ export const categories: Category[] = [
     description: "Headphones, earbuds, and speakers built for clarity.",
     icon: "Headphones",
     productCount: 4,
-    image: "/images/categories/audio.jpg",
+    image: "/images/categories/audio1.jpg",
   },
   {
     id: "2",
