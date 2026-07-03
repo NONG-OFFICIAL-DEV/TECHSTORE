@@ -158,6 +158,16 @@ summary {
   }
 }
  
+/* Hide scrollbar for horizontally-scrollable chip rows (category filters,
+   thumbnail strips) while keeping the element natively scrollable. */
+.scrollbar-hide {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE/Edge */
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none; /* Chrome/Safari */
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;
