@@ -1,0 +1,85 @@
+"use client";
+
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { motion } from "framer-motion";
+import { Home, Grid3x3, ShoppingBag, Info, Mail, LucideIcon } from "lucide-react";
+import { useCart } from "@/hooks/use-cart";
+import { cn } from "@/lib/utils";
+
+interface BottomNavItem {
+  href: string;
+  label: string;
+  icon: LucideIcon;
+}
+
+const BOTTOM_NAV_ITEMS: BottomNavItem[] = [
+  { href: "/", label: "Home", icon: Home },
+  { href: "/products", label: "Shop", icon: Grid3x3 },
+  { href: "/cart", label: "Cart", icon: ShoppingBag },
+  { href: "/about", label: "About", icon: Info },
+  { href: "/contact", label: "Contact", icon: Mail },
+];
+
+export function MobileNav() {
+  const pathname = usePathname();
+  const totalItems = useCart((state) => state.totalItems());
+
+  return (
+    <nav
+      aria-label="Mobile navigation"
+      className="fixed inset-x-0 bottom-0 z-50 border-t border-border bg-background/90 backdrop-blur-md md:hidden"
+      style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
+    >
+      <ul className="grid grid-cols-5">
+        {BOTTOM_NAV_ITEMS.map((item) => {
+          const active =
+            item.href === "/"
+              ? pathname === "/"
+              : pathname.startsWith(item.href);
+          const Icon = item.icon;
+
+          return (
+            <li key={item.href}>
+              <Link
+                href={item.href}
+                aria-label={item.label}
+                aria-current={active ? "page" : undefined}
+                className="relative flex flex-col items-center justify-center gap-1 py-2.5 text-muted-foreground transition-colors"
+              >
+                {active && (
+                  <motion.span
+                    layoutId="bottom-nav-active"
+                    className="absolute inset-x-3 top-0 h-0.5 rounded-full bg-primary"
+                    transition={{ type: "spring", bounce: 0.25, duration: 0.5 }}
+                  />
+                )}
+
+                <span className="relative flex h-6 w-6 items-center justify-center">
+                  <Icon
+                    className={cn("h-5 w-5", active && "text-primary")}
+                    strokeWidth={active ? 2.25 : 1.75}
+                  />
+                  {item.href === "/cart" && totalItems > 0 && (
+                    <span className="absolute -right-2 -top-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[9px] font-mono font-medium text-primary-foreground">
+                      {totalItems > 9 ? "9+" : totalItems}
+                    </span>
+                  )}
+                </span>
+
+                <span
+                  className={cn(
+                    "text-[10px] font-medium",
+                    active && "text-primary"
+                  )}
+                >
+                  {item.label}
+                </span>
+              </Link>
+            </li>
+          );
+        })}
+      </ul>
+    </nav>
+  );
+}
