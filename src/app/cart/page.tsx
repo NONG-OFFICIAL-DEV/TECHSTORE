@@ -26,7 +26,7 @@ export default function CartPage() {
 
   if (items.length === 0) {
     return (
-      <div className="mx-auto max-w-7xl px-6 md:px-8 py-10">
+      <div className="mx-auto max-w-7xl px-6 md:px-8 py-5">
         <Breadcrumb items={[{ label: "Cart" }]} className="mb-8" />
         <EmptyState
           icon={ShoppingBag}
@@ -40,7 +40,7 @@ export default function CartPage() {
   }
 
   return (
-    <div className="mx-auto max-w-7xl px-6 md:px-8 py-10">
+    <div className="mx-auto max-w-7xl px-6 md:px-8 py-5">
       <Breadcrumb items={[{ label: "Cart" }]} className="mb-8" />
 
       <div className="mb-8 flex items-end justify-between gap-4">

@@ -46,7 +46,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
   const related = getRelatedProducts(product);
 
   return (
-    <div className="mx-auto max-w-7xl px-6 md:px-8 py-10">
+    <div className="mx-auto max-w-7xl px-6 md:px-8 py-5">
       <Breadcrumb
         items={[
           { label: "Products", href: "/products" },

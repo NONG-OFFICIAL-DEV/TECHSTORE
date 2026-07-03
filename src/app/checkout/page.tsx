@@ -248,7 +248,7 @@ export default function CheckoutPage() {
   }
 
   return (
-    <div className="mx-auto max-w-7xl px-6 md:px-8 py-10">
+    <div className="mx-auto max-w-7xl px-6 md:px-8 py-5">
       <Breadcrumb items={[{ label: "Cart", href: "/cart" }, { label: "Checkout" }]} className="mb-8" />
 
       <div className="mb-2">

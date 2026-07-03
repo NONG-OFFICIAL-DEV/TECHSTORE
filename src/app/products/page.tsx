@@ -79,7 +79,7 @@ export default function ProductsPage() {
   };
 
   return (
-    <div className="mx-auto max-w-7xl px-6 md:px-8 py-10">
+    <div className="mx-auto max-w-7xl px-6 md:px-8 py-5">
       <Breadcrumb items={[{ label: "Products" }]} className="mb-8" />
 
       <div className="mb-8">
