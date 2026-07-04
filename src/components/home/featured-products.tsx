@@ -9,7 +9,7 @@ export function FeaturedProducts() {
   const featured = getFeaturedProducts();
 
   return (
-    <section className="mx-auto max-w-7xl px-6 md:px-8 py-16 md:py-24">
+    <section className="mx-auto max-w-7xl px-6 md:px-8 py-4 md:py-4">
       <div className="flex items-end justify-between gap-4 flex-wrap">
         <SectionHeading
           eyebrow="Handpicked"
