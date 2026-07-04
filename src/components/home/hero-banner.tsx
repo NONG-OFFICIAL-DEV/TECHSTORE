@@ -24,7 +24,7 @@ const BANNER_SLIDES: BannerSlide[] = [
     offer: "Up to 20% off Voucher",
     ctaLabel: "Shop Now",
     ctaHref: "/products?category=audio",
-    image: "/images/hero/spotlight-audio.jpg",
+    image: "/images/hero/spotlight-wearables.jpg",
     imageAlt: "AeroBuds Pro wireless earbuds",
   },
   {
@@ -32,7 +32,7 @@ const BANNER_SLIDES: BannerSlide[] = [
     offer: "Launch price — 15% off",
     ctaLabel: "Shop Now",
     ctaHref: "/products?category=wearables",
-    image: "/images/hero/spotlight-wearables.jpg",
+    image: "/images/hero/hero-product.jpg",
     imageAlt: "PulseWatch smartwatch",
   },
 ];
@@ -52,7 +52,7 @@ export function HeroBanner({ className }: { className?: string }) {
   return (
     <div
       className={cn(
-        "relative overflow-hidden rounded-xl bg-neutral-950 min-h-[220px] aspect-[16/9] sm:aspect-[21/9]",
+        "relative overflow-hidden rounded-xl bg-neutral-950 aspect-[16/9] sm:aspect-[21/9]",
         className
       )}
     >
