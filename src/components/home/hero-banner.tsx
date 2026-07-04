@@ -24,7 +24,7 @@ const BANNER_SLIDES: BannerSlide[] = [
     offer: "Up to 20% off Voucher",
     ctaLabel: "Shop Now",
     ctaHref: "/products?category=audio",
-    image: "/images/hero/hero-product-2.avif",
+    image: "/images/hero/hero-product-2.jpg",
     imageAlt: "AeroBuds Pro wireless earbuds",
   },
   {
