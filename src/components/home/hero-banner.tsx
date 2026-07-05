@@ -39,8 +39,13 @@ const BANNER_SLIDES: BannerSlide[] = [
 
 export function HeroBanner({ className }: { className?: string }) {
   const [active, setActive] = useState(0);
+  // Tracks whether this is the very first paint. We skip enter/exit
+  // animation on first mount so content is visible immediately even if
+  // JS hydration is slow — mobile webviews are the most likely to hit this.
+  const [hasMounted, setHasMounted] = useState(false);
 
   useEffect(() => {
+    setHasMounted(true);
     const timer = setInterval(() => {
       setActive((prev) => (prev + 1) % BANNER_SLIDES.length);
     }, 6000);
@@ -52,14 +57,17 @@ export function HeroBanner({ className }: { className?: string }) {
   return (
     <div
       className={cn(
-        "relative overflow-hidden rounded-xl bg-neutral-950 aspect-[16/9] sm:aspect-[21/9]",
+        // min-h is a hard fallback: guarantees a visible box even if
+        // aspect-ratio isn't computed (0-width parent, unsupported browser,
+        // etc). aspect-[] still takes over once the parent has real width.
+        "relative overflow-hidden rounded-xl bg-neutral-950 w-full min-h-[200px] aspect-[16/9] sm:aspect-[21/9]",
         className
       )}
     >
-      <AnimatePresence mode="wait">
+      <AnimatePresence mode="wait" initial={false}>
         <motion.div
           key={active}
-          initial={{ opacity: 0 }}
+          initial={hasMounted ? { opacity: 0 } : false}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.6, ease: "easeOut" }}
@@ -80,10 +88,10 @@ export function HeroBanner({ className }: { className?: string }) {
       </AnimatePresence>
 
       {/* Text overlay */}
-      <AnimatePresence mode="wait">
+      <AnimatePresence mode="wait" initial={false}>
         <motion.div
           key={active}
-          initial={{ opacity: 0, y: 12 }}
+          initial={hasMounted ? { opacity: 0, y: 12 } : false}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -12 }}
           transition={{ duration: 0.4, ease: "easeOut", delay: 0.1 }}
