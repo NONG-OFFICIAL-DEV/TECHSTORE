@@ -1,15 +1,14 @@
 "use client";
 
-import { useState } from "react";
+import { useRef,useState } from "react";
 import { motion } from "framer-motion";
-import { Star, ShoppingCart, Check, Minus, Plus } from "lucide-react";
+import { Star, ShoppingCart, Check, Minus, Plus ,Loader2} from "lucide-react";
 import { Product } from "@/types/product";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { useCart } from "@/hooks/use-cart";
 import { cn, formatPrice } from "@/lib/utils";
-
 interface ProductInfoProps {
   product: Product;
 }
@@ -17,13 +16,30 @@ interface ProductInfoProps {
 export function ProductInfo({ product }: ProductInfoProps) {
   const [selectedColor, setSelectedColor] = useState(product.colors?.[0]?.name);
   const [quantity, setQuantity] = useState(1);
+  const [isAdding, setIsAdding] = useState(false);
   const [justAdded, setJustAdded] = useState(false);
   const addItem = useCart((state) => state.addItem);
 
+  // Ref guard closes the gap between click and React re-render — a fast
+  // double-click can fire before `disabled` updates from state alone.
+  const isProcessingRef = useRef(false);
+
   const handleAddToCart = () => {
+    if (isProcessingRef.current || justAdded || !product.inStock) return;
+    isProcessingRef.current = true;
+
+    setIsAdding(true);
     addItem(product, quantity, selectedColor);
-    setJustAdded(true);
-    setTimeout(() => setJustAdded(false), 2000);
+
+    // Brief artificial delay so the loading state is visible and readable,
+    // rather than flashing for one frame since addItem is synchronous.
+    setTimeout(() => {
+      setIsAdding(false);
+      setJustAdded(true);
+      isProcessingRef.current = false;
+
+      setTimeout(() => setJustAdded(false), 2000);
+    }, 400);
   };
 
   return (
@@ -151,13 +167,17 @@ export function ProductInfo({ product }: ProductInfoProps) {
           </button>
         </div>
 
-        <Button
+       <Button
           size="lg"
           onClick={handleAddToCart}
-          disabled={!product.inStock}
+          disabled={!product.inStock || isAdding || justAdded}
           className="flex-1 gap-2"
         >
-          {justAdded ? (
+          {isAdding ? (
+            <>
+              <Loader2 className="h-4 w-4 animate-spin" /> Adding...
+            </>
+          ) : justAdded ? (
             <>
               <Check className="h-4 w-4" /> Added to Cart
             </>
