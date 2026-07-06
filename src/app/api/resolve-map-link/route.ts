@@ -21,7 +21,7 @@ export async function GET(request: NextRequest) {
       },
     });
 
-    let finalUrl = response.url || url;
+    const finalUrl = response.url || url;
     let coords = parseCoordsFromGoogleMapsUrl(finalUrl);
 
     // Some short links land on an interstitial page rather than encoding

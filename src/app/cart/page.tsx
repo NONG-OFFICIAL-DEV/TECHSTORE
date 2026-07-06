@@ -10,6 +10,7 @@ import { Separator } from "@/components/ui/separator";
 import { Breadcrumb } from "@/components/shared/breadcrumb";
 import { EmptyState } from "@/components/shared/empty-state";
 import { cn, formatPrice } from "@/lib/utils";
+import { SectionHeading } from "@/components/shared/section-heading";
 
 const FREE_SHIPPING_THRESHOLD = 150;
 const SHIPPING_COST = 12;
@@ -43,16 +44,18 @@ export default function CartPage() {
     <div className="mx-auto max-w-7xl px-6 md:px-8 py-5">
       <Breadcrumb items={[{ label: "Cart" }]} className="mb-8" />
 
-      <div className="mb-8 flex items-end justify-between gap-4">
-        <div>
-          <h1 className="text-3xl md:text-4xl font-bold tracking-tight text-foreground">
-            Your Cart
-          </h1>
-          <p className="mt-2 text-muted-foreground">
-            {items.length} item{items.length !== 1 ? "s" : ""} in your cart
-          </p>
-        </div>
-        <Button variant="ghost" size="sm" onClick={clearCart} className="gap-1.5 text-muted-foreground">
+      <div className="mb-8 md:mb-12 flex items-start justify-between gap-4">
+        <SectionHeading
+          title="Your Cart"
+          description={`${items.length} item${items.length !== 1 ? "s" : ""} in your cart`}
+          className="mb-0 md:mb-0"
+        />
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={clearCart}
+          className="gap-1.5 text-muted-foreground shrink-0"
+        >
           <Trash2 className="h-3.5 w-3.5" />
           Clear cart
         </Button>

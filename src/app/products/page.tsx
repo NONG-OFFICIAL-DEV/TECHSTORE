@@ -10,6 +10,7 @@ import { CategoryFilter } from "@/components/product/category-filter";
 import { SortDropdown } from "@/components/product/sort-dropdown";
 import { Pagination } from "@/components/shared/pagination";
 import { Breadcrumb } from "@/components/shared/breadcrumb";
+import { SectionHeading } from "@/components/shared/section-heading";
 
 const PAGE_SIZE = 8;
 
@@ -81,15 +82,10 @@ export default function ProductsPage() {
   return (
     <div className="mx-auto max-w-7xl px-6 md:px-8 py-5">
       <Breadcrumb items={[{ label: "Products" }]} className="mb-8" />
-
-      <div className="mb-8">
-        <h1 className="text-3xl md:text-4xl font-bold tracking-tight text-foreground">
-          All Products
-        </h1>
-        <p className="mt-2 text-muted-foreground">
-          {filtered.length} product{filtered.length !== 1 ? "s" : ""} found
-        </p>
-      </div>
+      <SectionHeading
+        title="All Products"
+        description={`${filtered.length} product${filtered.length !== 1 ? "s" : ""} found`}
+      />
 
       <CategoryFilter
         categories={categories}

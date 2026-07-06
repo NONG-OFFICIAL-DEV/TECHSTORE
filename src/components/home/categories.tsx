@@ -1,10 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
 import { motion } from "framer-motion";
-import { Headphones, Watch, Laptop, Home as HomeIcon, LucideIcon } from "lucide-react";
+import { Headphones, Watch, Laptop, Home as HomeIcon, type LucideIcon } from "lucide-react";
 import { categories } from "@/data/products";
+import { Container } from "@/components/shared/container";
+import { cn } from "@/lib/utils";
 import { SectionHeading } from "@/components/shared/section-heading";
 
 const ICON_MAP: Record<string, LucideIcon> = {
@@ -16,52 +17,62 @@ const ICON_MAP: Record<string, LucideIcon> = {
 
 export function Categories() {
   return (
-    <section className="mx-auto max-w-7xl px-6 md:px-8 py-16 md:py-24">
+    <Container className="py-16 md:py-16">
       <SectionHeading
         eyebrow="Browse"
-        title="Shop by Category"
-        description="Find exactly what you're looking for, organized the way you think."
-        align="center"
+        title="Top Category"
+        description="Browse gear by type — find exactly what you're looking for in seconds."
+        action={{ label: "View all", href: "/categories" }}
       />
 
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
-        {categories.map((category, index) => {
-          const Icon = ICON_MAP[category.icon] ?? Headphones;
-          return (
-            <motion.div
-              key={category.id}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-60px" }}
-              transition={{ duration: 0.4, delay: index * 0.08, ease: "easeOut" }}
-            >
-              <Link
-                href={`/products?category=${category.slug}`}
-                className="group relative flex flex-col justify-end overflow-hidden rounded-2xl border border-border/60 aspect-[4/5] p-5 transition-all duration-300 hover:border-primary/40"
+      {/* Icon row: horizontal scroll on mobile, wraps + centers from sm up */}
+      <div className="relative">
+        <div
+          className={cn(
+            "flex gap-6 overflow-x-auto scrollbar-hide snap-x snap-proximity",
+            "px-4 -mx-4 scroll-px-4",
+            "sm:flex-wrap sm:justify-center sm:overflow-visible sm:px-0 sm:mx-0"
+          )}
+        >
+          {categories.map((category, index) => {
+            const Icon = ICON_MAP[category.icon] ?? Headphones;
+            return (
+              <motion.div
+                key={category.id}
+                initial={{ opacity: 0, y: 16 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-60px" }}
+                transition={{ duration: 0.35, delay: index * 0.06, ease: "easeOut" }}
+                className="shrink-0 snap-start"
               >
-                <Image
-                  src={category.image}
-                  alt={category.name}
-                  fill
-                  sizes="(max-width: 768px) 50vw, 25vw"
-                  className="object-cover transition-transform duration-500 ease-out group-hover:scale-110 -z-20"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-background via-background/40 to-transparent -z-10" />
+                <Link
+                  href={`/products?category=${category.slug}`}
+                  className="group flex flex-col items-center gap-3 w-20"
+                >
+                  <span
+                    className={cn(
+                      "flex h-14 w-14 items-center justify-center rounded-full border border-border",
+                      "transition-all duration-300 group-hover:border-primary group-hover:-translate-y-1",
+                      "group-hover:shadow-lg group-hover:shadow-primary/15"
+                    )}
+                  >
+                    <Icon className="h-6 w-6 text-muted-foreground transition-colors group-hover:text-primary" />
+                  </span>
+                  <span className="text-xs font-medium text-muted-foreground text-center transition-colors group-hover:text-foreground">
+                    {category.name}
+                  </span>
+                </Link>
+              </motion.div>
+            );
+          })}
+        </div>
 
-                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/90 backdrop-blur-sm mb-3">
-                  <Icon className="h-5 w-5 text-primary-foreground" />
-                </div>
-                <h3 className="text-base font-semibold text-foreground">
-                  {category.name}
-                </h3>
-                <p className="text-xs text-muted-foreground mt-0.5">
-                  {category.productCount} products
-                </p>
-              </Link>
-            </motion.div>
-          );
-        })}
+        {/* Edge fade hinting more content on mobile scroll */}
+        <div
+          className="pointer-events-none absolute inset-y-0 left-0 right-0 sm:hidden [mask-image:linear-gradient(to_right,transparent,black_20px,black_calc(100%-28px),transparent)]"
+          aria-hidden
+        />
       </div>
-    </section>
+    </Container>
   );
 }
