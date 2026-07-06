@@ -39,7 +39,7 @@ export function SectionHeading({
     >
       <div
         className={cn(
-          "flex items-start justify-between gap-4",
+          "flex justify-between gap-4",
           useCenteredLayout && "flex-col items-center text-center mx-auto max-w-2xl"
         )}
       >
