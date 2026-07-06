@@ -68,7 +68,7 @@ export function ProductCard({ product, index = 0 }: ProductCardProps) {
               size="icon"
               onClick={handleAddToCart}
               aria-label={`Add ${product.name} to cart`}
-              className="rounded-full shadow-lg"
+              className="rounded-full shadow-lg cursor-pointer"
             >
               <ShoppingCart className="h-4 w-4" />
             </Button>
