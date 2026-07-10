@@ -54,7 +54,6 @@ export const products: Product[] = [
     images: [
       "/images/products/headphones-1.jpg",
       "/images/products/headphones-2.jpg",
-      "/images/products/headphones-3.jpg",
     ],
     thumbnail: "/images/products/headphones-1.jpg",
     description:
@@ -137,10 +136,7 @@ export const products: Product[] = [
     currency: "USD",
     rating: 4.7,
     reviewCount: 156,
-    images: [
-      "/images/products/watch-1.jpg",
-      "/images/products/watch-2.jpg",
-    ],
+    images: ["/images/products/watch-1.jpg"],
     thumbnail: "/images/products/watch-1.jpg",
     description:
       "A health companion on your wrist. Orbit tracks heart rate, sleep, and activity with clinical-grade sensors wrapped in an aerospace-aluminum case.",
