@@ -68,15 +68,35 @@ export default function ProductsPage() {
     page * PAGE_SIZE
   );
 
+  // A narrower filter/sort/page result can leave the user scrolled past
+  // where the (now much shorter) list actually renders — bring them back
+  // to the top so the new results are what they actually see.
+  const scrollToResults = () => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
   const handleFilterChange = (fn: () => void) => {
     fn();
     setPage(1);
+    scrollToResults();
+  };
+
+  const handleSortChange = (value: SortOption) => {
+    setSort(value);
+    setPage(1);
+    scrollToResults();
+  };
+
+  const handlePageChange = (nextPage: number) => {
+    setPage(nextPage);
+    scrollToResults();
   };
 
   const handleClearFilters = () => {
     setSearch("");
     setCategory(undefined);
     setPage(1);
+    scrollToResults();
   };
 
   return (
@@ -100,7 +120,7 @@ export default function ProductsPage() {
           onChange={(value) => handleFilterChange(() => setSearch(value))}
           className="flex-1"
         />
-        <SortDropdown value={sort} onChange={setSort} />
+        <SortDropdown value={sort} onChange={handleSortChange} />
       </div>
 
       <ProductGrid
@@ -114,7 +134,7 @@ export default function ProductsPage() {
         <Pagination
           currentPage={page}
           totalPages={totalPages}
-          onPageChange={setPage}
+          onPageChange={handlePageChange}
           className="mt-12"
         />
       )}
