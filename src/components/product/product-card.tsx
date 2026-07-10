@@ -36,7 +36,13 @@ export function ProductCard({ product, index = 0 }: ProductCardProps) {
     >
       <Link
         href={`/products/${product.slug}`}
-        className="flex h-full flex-col rounded-2xl border border-border/60 bg-card/40 backdrop-blur-sm overflow-hidden transition-all duration-300 hover:border-primary/40 hover:shadow-[0_0_32px_-8px] hover:shadow-primary/20"
+        className={cn(
+          "flex h-full flex-col rounded-2xl border border-border/60 bg-card/40 backdrop-blur-sm overflow-hidden transition-all duration-300",
+          "hover:border-primary/40 hover:shadow-[0_0_32px_-8px] hover:shadow-primary/20",
+          // :active fires on tap (unlike :hover), so touch users still get
+          // feedback that the card responded to their press.
+          "active:scale-[0.98] active:border-primary/30"
+        )}
       >
         {/* Image */}
         <div className="relative aspect-square overflow-hidden bg-muted/30">
@@ -62,13 +68,20 @@ export function ProductCard({ product, index = 0 }: ProductCardProps) {
             )}
           </div>
 
-          {/* Quick add */}
-          <div className="absolute bottom-3 right-3 translate-y-2 opacity-0 transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100">
+          {/* Quick add — always visible on touch devices (no hover to
+              reveal it on), hover-reveal kept only from md up where a
+              mouse/hover actually exists. */}
+          <div
+            className={cn(
+              "absolute bottom-3 right-3 opacity-100 translate-y-0 transition-all duration-300",
+              "md:opacity-0 md:translate-y-2 md:group-hover:translate-y-0 md:group-hover:opacity-100"
+            )}
+          >
             <Button
               size="icon"
               onClick={handleAddToCart}
               aria-label={`Add ${product.name} to cart`}
-              className="rounded-full shadow-lg cursor-pointer"
+              className="h-11 w-11 md:h-10 md:w-10 rounded-full shadow-lg cursor-pointer"
             >
               <ShoppingCart className="h-4 w-4" />
             </Button>
@@ -76,7 +89,7 @@ export function ProductCard({ product, index = 0 }: ProductCardProps) {
         </div>
 
         {/* Content */}
-        <div className="flex flex-1 flex-col p-4 gap-3">
+        <div className="flex flex-1 flex-col p-3 sm:p-4 gap-2.5 sm:gap-3">
           <div>
             <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
               {product.brand}
@@ -92,8 +105,10 @@ export function ProductCard({ product, index = 0 }: ProductCardProps) {
             <span>({product.reviewCount})</span>
           </div>
 
-          {/* Spec strip — signature element */}
-          <ul className="flex flex-col gap-1 border-t border-border/50 pt-3 text-xs text-muted-foreground">
+          {/* Spec strip — signature element on larger cards, but too much
+              detail for a quick mobile browse. Hidden below sm; mobile
+              cards show only name, rating, and price. */}
+          <ul className="hidden sm:flex flex-col gap-1 border-t border-border/50 pt-3 text-xs text-muted-foreground">
             {specEntries.map(([key, value]) => (
               <li key={key} className="flex items-center justify-between gap-2">
                 <span className="truncate">{key}</span>

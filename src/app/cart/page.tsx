@@ -54,7 +54,7 @@ export default function CartPage() {
           variant="ghost"
           size="sm"
           onClick={clearCart}
-          className="gap-1.5 text-muted-foreground shrink-0"
+          className="gap-1.5 text-muted-foreground hover:text-destructive transition-colors shrink-0"
         >
           <Trash2 className="h-3.5 w-3.5" />
           Clear cart
