@@ -56,7 +56,7 @@ export function ProductInfo({ product }: ProductInfoProps) {
       initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, ease: "easeOut" }}
-      className="flex flex-col gap-6"
+      className="flex flex-col gap-6 min-w-0"
     >
       {/* Header */}
       <div>

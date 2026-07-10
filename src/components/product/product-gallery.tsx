@@ -14,7 +14,7 @@ export function ProductGallery({ images, productName }: ProductGalleryProps) {
   const [activeIndex, setActiveIndex] = useState(0);
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-4 min-w-0">
       <div className="relative aspect-square w-full overflow-hidden rounded-2xl border border-border/60 bg-muted/20">
         <AnimatePresence mode="wait">
           <motion.div
@@ -31,7 +31,7 @@ export function ProductGallery({ images, productName }: ProductGalleryProps) {
               fill
               priority
               sizes="(max-width: 768px) 100vw, 50vw"
-              className="object-contain object-center p-8 transition-transform duration-500 ease-out group-hover:scale-125"
+              className="object-cover transition-transform duration-500 ease-out group-hover:scale-125"
             />
           </motion.div>
         </AnimatePresence>
