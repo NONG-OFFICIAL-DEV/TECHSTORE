@@ -31,7 +31,7 @@ export function ProductGallery({ images, productName }: ProductGalleryProps) {
               fill
               priority
               sizes="(max-width: 768px) 100vw, 50vw"
-              className="object-cover transition-transform duration-500 ease-out group-hover:scale-125"
+              className="object-contain object-center p-8 transition-transform duration-500 ease-out group-hover:scale-125"
             />
           </motion.div>
         </AnimatePresence>
