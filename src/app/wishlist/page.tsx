@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Heart, ShoppingCart, Trash2 } from "lucide-react";
 import { useWishlist } from "@/hooks/use-wishlist";
 import { useCart } from "@/hooks/use-cart";
+import { useHasMounted } from "@/hooks/use-has-mounted";
 import { Button } from "@/components/ui/button";
 import { Breadcrumb } from "@/components/shared/breadcrumb";
 import { EmptyState } from "@/components/shared/empty-state";
@@ -13,9 +14,14 @@ import { SectionHeading } from "@/components/shared/section-heading";
 import { formatPrice } from "@/lib/utils";
 
 export default function WishlistPage() {
-  const items = useWishlist((state) => state.items);
+  const storedItems = useWishlist((state) => state.items);
   const removeItem = useWishlist((state) => state.removeItem);
   const addToCart = useCart((state) => state.addItem);
+
+  // Wishlist state comes from localStorage, which the server can't see —
+  // gate on mount so the first client render matches the server's markup.
+  const mounted = useHasMounted();
+  const items = mounted ? storedItems : [];
 
   if (items.length === 0) {
     return (

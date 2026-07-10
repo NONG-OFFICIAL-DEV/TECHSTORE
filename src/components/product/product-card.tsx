@@ -9,6 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/hooks/use-cart";
 import { useWishlist } from "@/hooks/use-wishlist";
+import { useHasMounted } from "@/hooks/use-has-mounted";
 import { cn, formatPrice } from "@/lib/utils";
 
 interface ProductCardProps {
@@ -18,8 +19,13 @@ interface ProductCardProps {
 
 export function ProductCard({ product, index = 0 }: ProductCardProps) {
   const addItem = useCart((state) => state.addItem);
-  const isWishlisted = useWishlist((state) => state.isWishlisted(product.id));
+  const wishlisted = useWishlist((state) => state.isWishlisted(product.id));
   const toggleWishlist = useWishlist((state) => state.toggleItem);
+
+  // Wishlist state comes from localStorage, which the server can't see —
+  // gate on mount so the first client render matches the server's markup.
+  const mounted = useHasMounted();
+  const isWishlisted = mounted && wishlisted;
 
   const specEntries = Object.entries(product.specs).slice(0, 3);
 

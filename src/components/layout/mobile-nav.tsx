@@ -4,8 +4,9 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion } from "framer-motion";
-import { Home, Grid3x3, ShoppingBag, Info, Mail, LucideIcon } from "lucide-react";
+import { Home, Grid3x3, ShoppingBag, Heart, Info, Mail, LucideIcon } from "lucide-react";
 import { useCart } from "@/hooks/use-cart";
+import { useWishlist } from "@/hooks/use-wishlist";
 import { cn } from "@/lib/utils";
 
 interface BottomNavItem {
@@ -18,6 +19,7 @@ const BOTTOM_NAV_ITEMS: BottomNavItem[] = [
   { href: "/", label: "Home", icon: Home },
   { href: "/products", label: "Shop", icon: Grid3x3 },
   { href: "/cart", label: "Cart", icon: ShoppingBag },
+  { href: "/wishlist", label: "Wishlist", icon: Heart },
   { href: "/about", label: "About", icon: Info },
   { href: "/contact", label: "Contact", icon: Mail },
 ];
@@ -25,7 +27,8 @@ const BOTTOM_NAV_ITEMS: BottomNavItem[] = [
 export function MobileNav() {
   const pathname = usePathname();
   const totalItems = useCart((state) => state.totalItems());
-  
+  const wishlistCount = useWishlist((state) => state.items.length);
+
   // Track mount status to delay reading local cart data during SSR
   const [isMounted, setIsMounted] = useState(false);
 
@@ -39,7 +42,7 @@ export function MobileNav() {
       className="fixed inset-x-0 bottom-0 z-50 border-t border-border bg-background/90 backdrop-blur-md md:hidden"
       style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
     >
-      <ul className="grid grid-cols-5">
+      <ul className="grid grid-cols-6">
         {BOTTOM_NAV_ITEMS.map((item) => {
           const active =
             item.href === "/"
@@ -72,6 +75,11 @@ export function MobileNav() {
                   {item.href === "/cart" && isMounted && totalItems > 0 && (
                     <span className="absolute -right-2 -top-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[9px] font-mono font-medium text-primary-foreground">
                       {totalItems > 9 ? "9+" : totalItems}
+                    </span>
+                  )}
+                  {item.href === "/wishlist" && isMounted && wishlistCount > 0 && (
+                    <span className="absolute -right-2 -top-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[9px] font-mono font-medium text-primary-foreground">
+                      {wishlistCount > 9 ? "9+" : wishlistCount}
                     </span>
                   )}
                 </span>

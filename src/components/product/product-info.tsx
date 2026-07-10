@@ -9,6 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { useCart } from "@/hooks/use-cart";
 import { useWishlist } from "@/hooks/use-wishlist";
+import { useHasMounted } from "@/hooks/use-has-mounted";
 import { cn, formatPrice } from "@/lib/utils";
 interface ProductInfoProps {
   product: Product;
@@ -20,8 +21,13 @@ export function ProductInfo({ product }: ProductInfoProps) {
   const [isAdding, setIsAdding] = useState(false);
   const [justAdded, setJustAdded] = useState(false);
   const addItem = useCart((state) => state.addItem);
-  const isWishlisted = useWishlist((state) => state.isWishlisted(product.id));
+  const wishlisted = useWishlist((state) => state.isWishlisted(product.id));
   const toggleWishlist = useWishlist((state) => state.toggleItem);
+
+  // Wishlist state comes from localStorage, which the server can't see —
+  // gate on mount so the first client render matches the server's markup.
+  const mounted = useHasMounted();
+  const isWishlisted = mounted && wishlisted;
 
   // Ref guard closes the gap between click and React re-render — a fast
   // double-click can fire before `disabled` updates from state alone.
