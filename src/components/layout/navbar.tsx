@@ -8,6 +8,8 @@ import { cn } from "@/lib/utils";
 import { NAV_LINKS } from "@/data/nav";
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/hooks/use-cart";
+import { useHasMounted } from "@/hooks/use-has-mounted";
+import { ThemeToggle } from "./theme-toggle";
 
 export function Navbar() {
   const pathname = usePathname();
@@ -16,10 +18,7 @@ export function Navbar() {
 
   // Avoid a hydration mismatch: the cart is read from localStorage, which
   // only exists on the client, so the server always renders 0 items.
-  const [mounted, setMounted] = React.useState(false);
-  React.useEffect(() => {
-    setMounted(true);
-  }, []);
+  const mounted = useHasMounted();
   const displayedCartCount = mounted ? totalItems : 0;
 
   React.useEffect(() => {
@@ -86,6 +85,8 @@ export function Navbar() {
               <Search />
             </Link>
           </Button>
+
+          <ThemeToggle />
 
           {/* Cart icon stays here for desktop; mobile users have the bottom tab bar */}
           <Button

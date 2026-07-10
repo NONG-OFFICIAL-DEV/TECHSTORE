@@ -1,5 +1,5 @@
 @import "tailwindcss";
-/* @import "tw-animate-css" layer(utilities); */
+@import "tw-animate-css";
 
 @custom-variant dark (&:is(.dark *));
 
@@ -9,28 +9,60 @@
 :root {
   --radius: 0.625rem;
 
-  /* Base surfaces */
-  --background: oklch(0.13 0.004 264);      /* #0B0C0E near-black, cool */
-  --foreground: oklch(0.96 0.002 264);      /* #F2F3F5 */
-  --surface: oklch(0.19 0.005 264);         /* #16181C card/panel surface */
-  --surface-hover: oklch(0.22 0.006 264);
-  --border-hairline: oklch(0.28 0.006 264); /* #26292F */
+  /* Light mode — same brand (amber accent, cool-neutral base), inverted
+     for a bright surface instead of the dark Instrument Panel look. */
+  --background: oklch(0.985 0.002 264);
+  --foreground: oklch(0.16 0.005 264);
+  --surface: oklch(0.96 0.003 264);
+  --surface-hover: oklch(0.92 0.004 264);
+  --border-hairline: oklch(0.87 0.004 264);
 
   --card: var(--surface);
   --card-foreground: var(--foreground);
   --popover: var(--surface);
   --popover-foreground: var(--foreground);
 
-  /* Text */
-  --muted: oklch(0.24 0.005 264);
-  --muted-foreground: oklch(0.65 0.01 264); /* #9AA0A8 */
+  --muted: oklch(0.94 0.003 264);
+  --muted-foreground: oklch(0.45 0.01 264);
 
-  /* Signal amber — the one accent, used deliberately */
-  --primary: oklch(0.72 0.19 45);           /* #FF7A45 */
+  /* Signal amber — same accent in both modes, slightly deepened here
+     so it holds contrast against a light background. */
+  --primary: oklch(0.64 0.19 45);
+  --primary-foreground: oklch(0.99 0.002 264);
+
+  --accent-secondary: oklch(0.55 0.19 260);
+
+  --secondary: var(--surface-hover);
+  --secondary-foreground: var(--foreground);
+  --destructive: oklch(0.58 0.22 25);
+  --border: var(--border-hairline);
+  --input: var(--border-hairline);
+  --ring: var(--primary);
+
+  --chart-1: var(--primary);
+  --chart-2: var(--accent-secondary);
+}
+
+/* Dark mode — the "Instrument Panel" look: dark, engineered, signal-amber */
+.dark {
+  --background: oklch(0.17 0.004 264);
+  --foreground: oklch(0.95 0.002 264);
+  --surface: oklch(0.23 0.005 264);
+  --surface-hover: oklch(0.27 0.006 264);
+  --border-hairline: oklch(0.33 0.006 264);
+
+  --card: var(--surface);
+  --card-foreground: var(--foreground);
+  --popover: var(--surface);
+  --popover-foreground: var(--foreground);
+
+  --muted: oklch(0.27 0.005 264);
+  --muted-foreground: oklch(0.68 0.01 264);
+
+  --primary: oklch(0.72 0.19 45);
   --primary-foreground: oklch(0.13 0.004 264);
 
-  /* Rare secondary accent — info/links only */
-  --accent-secondary: oklch(0.62 0.19 260); /* #4C8DFF */
+  --accent-secondary: oklch(0.62 0.19 260);
 
   --secondary: var(--surface-hover);
   --secondary-foreground: var(--foreground);
@@ -68,6 +100,22 @@
   --font-sans: var(--font-inter);
   --font-mono: var(--font-jetbrains-mono);
 
+  /* ---------------------------------------------------------------- */
+  /* Fluid type scale — scales smoothly from 320px up to 1440px+       */
+  /* so headings never need manual sm:/md:/lg: font-size overrides.    */
+  /* clamp(min, preferred, max) — preferred uses vw so it's fluid.     */
+  /* ---------------------------------------------------------------- */
+  --text-hero: clamp(2.25rem, 1.85rem + 2vw, 4.5rem);       /* 36px -> 72px */
+  --text-hero--line-height: 1.05;
+  --text-display-1: clamp(1.875rem, 1.6rem + 1.35vw, 3rem); /* 30px -> 48px */
+  --text-display-1--line-height: 1.1;
+  --text-display-2: clamp(1.5rem, 1.32rem + 0.9vw, 2.25rem);/* 24px -> 36px */
+  --text-display-2--line-height: 1.15;
+  --text-display-3: clamp(1.25rem, 1.15rem + 0.5vw, 1.75rem); /* 20px -> 28px */
+  --text-display-3--line-height: 1.2;
+  --text-body-lg: clamp(1rem, 0.94rem + 0.3vw, 1.125rem);   /* 16px -> 18px */
+  --text-body-lg--line-height: 1.6;
+
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
@@ -96,12 +144,6 @@
   }
 }
 
-/* Light mode override (dark is default per brand, but we support toggling) */
-.dark {
-  --background: oklch(0.13 0.004 264);
-  --foreground: oklch(0.96 0.002 264);
-}
-
 body {
   background: var(--background);
   color: var(--foreground);
@@ -126,15 +168,6 @@ body {
   }
 }
 
-@layer base {
-  * {
-    @apply border-border outline-ring/50;
-  }
-  body {
-    @apply bg-background text-foreground;
-  }
-}
-
 /* Prevent double-tap-to-zoom on interactive elements (mobile browsers
    interpret two fast taps as a zoom gesture unless told otherwise).
    Pinch-to-zoom remains fully enabled for accessibility (WCAG 1.4.4) —
@@ -147,7 +180,7 @@ select,
 summary {
   touch-action: manipulation;
 }
- 
+
 /* Prevent iOS Safari from auto-zooming when a form field is focused —
    any input below 16px triggers it. Applies only below the sm breakpoint. */
 @media (max-width: 639px) {
@@ -157,7 +190,7 @@ summary {
     font-size: 16px;
   }
 }
- 
+
 /* Hide scrollbar for horizontally-scrollable chip rows (category filters,
    thumbnail strips) while keeping the element natively scrollable. */
 .scrollbar-hide {
