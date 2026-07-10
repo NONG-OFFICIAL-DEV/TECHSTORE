@@ -162,6 +162,8 @@ export default function CheckoutPage() {
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isOrdered, setIsOrdered] = useState(false);
+  const [orderNumber, setOrderNumber] = useState<string | null>(null);
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
   const handleLocationChange = (loc: DeliveryRegion) => {
     setLocation(loc);
@@ -209,12 +211,45 @@ export default function CheckoutPage() {
     e.preventDefault();
     if (step !== 2) return; // only the final Review & Payment step actually submits
     setIsSubmitting(true);
+    setSubmitError(null);
     try {
-      await new Promise((resolve) => setTimeout(resolve, 1500));
+      const response = await fetch("/api/orders", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          customer: { fullName, phone },
+          delivery: {
+            region: location,
+            address,
+            province: location === LOCATION_PROVINCE ? selectedProvince : undefined,
+            district: location === LOCATION_PROVINCE ? selectedDistrict : undefined,
+            coords,
+          },
+          shipping: { method: selectedShipping.name, cost: selectedShipping.cost },
+          paymentMethod,
+          items: items.map((item) => ({
+            productId: item.product.id,
+            name: item.product.name,
+            price: item.product.price,
+            quantity: item.quantity,
+            selectedColor: item.selectedColor,
+          })),
+          subtotal,
+          total,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Order submission failed");
+      }
+
+      const data = await response.json();
+      setOrderNumber(data.orderNumber);
       setIsOrdered(true);
       clearCart();
     } catch (error) {
       console.error(error);
+      setSubmitError("Something went wrong placing your order. Please try again.");
       setIsSubmitting(false);
     }
   };
@@ -226,8 +261,13 @@ export default function CheckoutPage() {
           <CheckCircle2 className="h-10 w-10" />
         </div>
         <h1 className="text-2xl font-bold">សូមអរគុណ! Order Placed!</h1>
+        {orderNumber && (
+          <p className="mt-4 rounded-lg border border-border/60 bg-card/40 px-4 py-2 font-mono text-sm font-semibold text-foreground">
+            Order #{orderNumber}
+          </p>
+        )}
         <p className="mt-3 text-sm text-muted-foreground leading-relaxed">
-          Your order has been registered. Please send your payment screenshot to our Telegram channel or page inbox to confirm fulfillment.
+          Your order has been registered. Please send your payment screenshot to our Telegram channel or page inbox, referencing your order number, to confirm fulfillment.
         </p>
         <Button asChild className="mt-8 w-full">
           <Link href="/products">Continue Shopping</Link>
@@ -598,7 +638,9 @@ export default function CheckoutPage() {
                   </div>
                 </div>
 
-                {stepError && <StepErrorBanner message={stepError} />}
+                {(stepError || submitError) && (
+                  <StepErrorBanner message={stepError ?? submitError!} />
+                )}
 
                 <div className="flex flex-col gap-3 sm:flex-row">
                   <Button type="button" variant="outline" size="lg" onClick={() => goToStep(1)} className="w-full sm:flex-1 h-12">

@@ -3,11 +3,12 @@
 import * as React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Search, ShoppingBag } from "lucide-react";
+import { Search, ShoppingBag, Heart } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { NAV_LINKS } from "@/data/nav";
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/hooks/use-cart";
+import { useWishlist } from "@/hooks/use-wishlist";
 import { useHasMounted } from "@/hooks/use-has-mounted";
 import { ThemeToggle } from "./theme-toggle";
 
@@ -15,11 +16,13 @@ export function Navbar() {
   const pathname = usePathname();
   const [scrolled, setScrolled] = React.useState(false);
   const totalItems = useCart((state) => state.totalItems());
+  const wishlistCount = useWishlist((state) => state.items.length);
 
   // Avoid a hydration mismatch: the cart is read from localStorage, which
   // only exists on the client, so the server always renders 0 items.
   const mounted = useHasMounted();
   const displayedCartCount = mounted ? totalItems : 0;
+  const displayedWishlistCount = mounted ? wishlistCount : 0;
 
   React.useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 8);
@@ -87,6 +90,23 @@ export function Navbar() {
           </Button>
 
           <ThemeToggle />
+
+          <Button
+            variant="ghost"
+            size="icon"
+            aria-label={`View wishlist, ${displayedWishlistCount} item${displayedWishlistCount === 1 ? "" : "s"}`}
+            className="relative hidden md:inline-flex"
+            asChild
+          >
+            <Link href="/wishlist">
+              <Heart />
+              {displayedWishlistCount > 0 && (
+                <span className="absolute right-1.5 top-1.5 flex h-3.5 w-3.5 items-center justify-center rounded-full bg-primary text-[9px] font-mono font-medium text-primary-foreground">
+                  {displayedWishlistCount > 9 ? "9+" : displayedWishlistCount}
+                </span>
+              )}
+            </Link>
+          </Button>
 
           {/* Cart icon stays here for desktop; mobile users have the bottom tab bar */}
           <Button

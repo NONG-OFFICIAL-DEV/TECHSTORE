@@ -3,11 +3,12 @@
 import Link from "next/link";
 import Image from "next/image";
 import { motion } from "framer-motion";
-import { Star, ShoppingCart } from "lucide-react";
+import { Star, ShoppingCart, Heart } from "lucide-react";
 import { Product } from "@/types/product";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/hooks/use-cart";
+import { useWishlist } from "@/hooks/use-wishlist";
 import { cn, formatPrice } from "@/lib/utils";
 
 interface ProductCardProps {
@@ -17,6 +18,8 @@ interface ProductCardProps {
 
 export function ProductCard({ product, index = 0 }: ProductCardProps) {
   const addItem = useCart((state) => state.addItem);
+  const isWishlisted = useWishlist((state) => state.isWishlisted(product.id));
+  const toggleWishlist = useWishlist((state) => state.toggleItem);
 
   const specEntries = Object.entries(product.specs).slice(0, 3);
 
@@ -24,6 +27,12 @@ export function ProductCard({ product, index = 0 }: ProductCardProps) {
     e.preventDefault();
     e.stopPropagation();
     addItem(product, 1, product.colors?.[0]?.name);
+  };
+
+  const handleToggleWishlist = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    toggleWishlist(product);
   };
 
   return (
@@ -67,6 +76,24 @@ export function ProductCard({ product, index = 0 }: ProductCardProps) {
               </Badge>
             )}
           </div>
+
+          {/* Wishlist toggle */}
+          <button
+            type="button"
+            onClick={handleToggleWishlist}
+            aria-label={
+              isWishlisted ? `Remove ${product.name} from wishlist` : `Add ${product.name} to wishlist`
+            }
+            aria-pressed={isWishlisted}
+            className="absolute top-3 right-3 flex h-8 w-8 items-center justify-center rounded-full bg-background/70 backdrop-blur-sm border border-border/60 transition-colors hover:border-primary/40 cursor-pointer"
+          >
+            <Heart
+              className={cn(
+                "h-4 w-4 transition-colors",
+                isWishlisted ? "fill-primary text-primary" : "text-muted-foreground"
+              )}
+            />
+          </button>
 
           {/* Quick add — always visible on touch devices (no hover to
               reveal it on), hover-reveal kept only from md up where a

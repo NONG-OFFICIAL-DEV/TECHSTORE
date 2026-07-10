@@ -1,6 +1,8 @@
 "use client"
 
+import { useState } from "react";
 import Link from "next/link";
+import { Loader2, Check } from "lucide-react";
 import { NAV_LINKS, CATEGORIES } from "@/data/nav";
 import { Button } from "@/components/ui/button";
 
@@ -10,7 +12,30 @@ const SOCIALS = [
   { label: "IG", name: "Instagram", href: "#" },
 ];
 
+type NewsletterStatus = "idle" | "submitting" | "success" | "error";
+
 export function Footer() {
+  const [email, setEmail] = useState("");
+  const [status, setStatus] = useState<NewsletterStatus>("idle");
+
+  const handleSubscribe = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setStatus("submitting");
+    try {
+      const response = await fetch("/api/newsletter", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      });
+      if (!response.ok) throw new Error("Newsletter signup failed");
+      setStatus("success");
+      setEmail("");
+    } catch (error) {
+      console.error(error);
+      setStatus("error");
+    }
+  };
+
   return (
     <footer className="border-t border-border bg-background">
       <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
@@ -24,21 +49,35 @@ export function Footer() {
             <p className="mt-3 max-w-xs text-sm text-muted-foreground">
               Gadgets chosen for how they&apos;re engineered, not just what they claim to do.
             </p>
-            <form className="mt-6 flex max-w-sm gap-2" onSubmit={(e) => e.preventDefault()}>
-              <label htmlFor="footer-email" className="sr-only">
-                Email address
-              </label>
-              <input
-                id="footer-email"
-                type="email"
-                required
-                placeholder="you@email.com"
-                className="h-10 w-full rounded-md border border-border bg-surface px-3 text-sm text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-              />
-              <Button type="submit" className="shrink-0">
-                Subscribe
-              </Button>
-            </form>
+            {status === "success" ? (
+              <p className="mt-6 flex items-center gap-1.5 text-sm font-medium text-emerald-500">
+                <Check className="h-4 w-4" /> You&apos;re subscribed!
+              </p>
+            ) : (
+              <form className="mt-6 flex max-w-sm gap-2" onSubmit={handleSubscribe}>
+                <label htmlFor="footer-email" className="sr-only">
+                  Email address
+                </label>
+                <input
+                  id="footer-email"
+                  type="email"
+                  required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="you@email.com"
+                  className="h-10 w-full rounded-md border border-border bg-surface px-3 text-sm text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                />
+                <Button type="submit" disabled={status === "submitting"} className="shrink-0 gap-1.5">
+                  {status === "submitting" && <Loader2 className="h-4 w-4 animate-spin" />}
+                  Subscribe
+                </Button>
+              </form>
+            )}
+            {status === "error" && (
+              <p className="mt-2 text-xs text-destructive">
+                Something went wrong — please try again.
+              </p>
+            )}
           </div>
 
           {/* Nav column */}
@@ -95,8 +134,8 @@ export function Footer() {
             © {new Date().getFullYear()} TECHSTORE. All rights reserved.
           </p>
           <div className="flex gap-6 font-mono text-xs text-muted-foreground">
-            <Link href="#" className="hover:text-foreground">Privacy</Link>
-            <Link href="#" className="hover:text-foreground">Terms</Link>
+            <Link href="/privacy" className="hover:text-foreground">Privacy</Link>
+            <Link href="/terms" className="hover:text-foreground">Terms</Link>
           </div>
         </div>
       </div>

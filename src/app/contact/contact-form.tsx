@@ -2,11 +2,11 @@
 
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Loader2, Send, CheckCircle2 } from "lucide-react";
+import { Loader2, Send, CheckCircle2, AlertCircle } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 
-type Status = "idle" | "submitting" | "success";
+type Status = "idle" | "submitting" | "success" | "error";
 
 export function ContactForm() {
   const [status, setStatus] = useState<Status>("idle");
@@ -16,11 +16,21 @@ export function ContactForm() {
     e.preventDefault();
     setStatus("submitting");
 
-    // Simulated submission — replace with your API route / email service
-    await new Promise((resolve) => setTimeout(resolve, 1200));
+    try {
+      const response = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(form),
+      });
 
-    setStatus("success");
-    setForm({ name: "", email: "", message: "" });
+      if (!response.ok) throw new Error("Contact submission failed");
+
+      setStatus("success");
+      setForm({ name: "", email: "", message: "" });
+    } catch (error) {
+      console.error(error);
+      setStatus("error");
+    }
   };
 
   if (status === "success") {
@@ -98,6 +108,16 @@ export function ContactForm() {
           className="mt-1.5 flex w-full rounded-lg border border-border/60 bg-background/60 px-4 py-3 text-sm backdrop-blur-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:border-primary/50 resize-none"
         />
       </div>
+
+      {status === "error" && (
+        <div
+          role="alert"
+          className="flex items-start gap-2.5 rounded-xl border border-destructive/40 bg-destructive/5 px-4 py-3 text-sm text-destructive"
+        >
+          <AlertCircle className="h-4 w-4 shrink-0 mt-0.5" />
+          <span>Something went wrong sending your message. Please try again.</span>
+        </div>
+      )}
 
       <Button
         type="submit"

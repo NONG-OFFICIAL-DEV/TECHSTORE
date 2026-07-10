@@ -2,12 +2,13 @@
 
 import { useRef,useState } from "react";
 import { motion } from "framer-motion";
-import { Star, ShoppingCart, Check, Minus, Plus ,Loader2} from "lucide-react";
+import { Star, ShoppingCart, Check, Minus, Plus ,Loader2, Heart} from "lucide-react";
 import { Product } from "@/types/product";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { useCart } from "@/hooks/use-cart";
+import { useWishlist } from "@/hooks/use-wishlist";
 import { cn, formatPrice } from "@/lib/utils";
 interface ProductInfoProps {
   product: Product;
@@ -19,6 +20,8 @@ export function ProductInfo({ product }: ProductInfoProps) {
   const [isAdding, setIsAdding] = useState(false);
   const [justAdded, setJustAdded] = useState(false);
   const addItem = useCart((state) => state.addItem);
+  const isWishlisted = useWishlist((state) => state.isWishlisted(product.id));
+  const toggleWishlist = useWishlist((state) => state.toggleItem);
 
   // Ref guard closes the gap between click and React re-render — a fast
   // double-click can fire before `disabled` updates from state alone.
@@ -187,6 +190,18 @@ export function ProductInfo({ product }: ProductInfoProps) {
               {product.inStock ? "Add to Cart" : "Out of Stock"}
             </>
           )}
+        </Button>
+
+        <Button
+          type="button"
+          size="lg"
+          variant="outline"
+          onClick={() => toggleWishlist(product)}
+          aria-label={isWishlisted ? "Remove from wishlist" : "Add to wishlist"}
+          aria-pressed={isWishlisted}
+          className="shrink-0"
+        >
+          <Heart className={cn("h-4 w-4", isWishlisted && "fill-primary text-primary")} />
         </Button>
       </div>
 
