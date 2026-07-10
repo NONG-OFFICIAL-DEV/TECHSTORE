@@ -200,12 +200,12 @@ export function ProductInfo({ product }: ProductInfoProps) {
 
         <Button
           type="button"
-          size="lg"
+          size="icon"
           variant="outline"
           onClick={() => toggleWishlist(product)}
           aria-label={isWishlisted ? "Remove from wishlist" : "Add to wishlist"}
           aria-pressed={isWishlisted}
-          className="shrink-0"
+          className="h-12 w-12 shrink-0"
         >
           <Heart className={cn("h-4 w-4", isWishlisted && "fill-primary text-primary")} />
         </Button>
