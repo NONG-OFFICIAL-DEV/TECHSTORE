@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion } from "framer-motion";
-import { Home, Grid3x3, ShoppingBag, Heart, Info, Mail, LucideIcon } from "lucide-react";
+import { Home, Grid3x3, ShoppingBag, Heart, LucideIcon } from "lucide-react";
 import { useCart } from "@/hooks/use-cart";
 import { useWishlist } from "@/hooks/use-wishlist";
 import { cn } from "@/lib/utils";
@@ -15,13 +15,13 @@ interface BottomNavItem {
   icon: LucideIcon;
 }
 
+// About/Contact intentionally left off this bar — it's reserved for the
+// core shopping actions; those pages stay reachable via the footer.
 const BOTTOM_NAV_ITEMS: BottomNavItem[] = [
   { href: "/", label: "Home", icon: Home },
   { href: "/products", label: "Shop", icon: Grid3x3 },
-  { href: "/cart", label: "Cart", icon: ShoppingBag },
   { href: "/wishlist", label: "Wishlist", icon: Heart },
-  { href: "/about", label: "About", icon: Info },
-  { href: "/contact", label: "Contact", icon: Mail },
+  { href: "/cart", label: "Cart", icon: ShoppingBag },
 ];
 
 export function MobileNav() {
@@ -42,7 +42,7 @@ export function MobileNav() {
       className="fixed inset-x-0 bottom-0 z-50 border-t border-border bg-background/90 backdrop-blur-md md:hidden"
       style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
     >
-      <ul className="grid grid-cols-6">
+      <ul className="grid grid-cols-4">
         {BOTTOM_NAV_ITEMS.map((item) => {
           const active =
             item.href === "/"
