@@ -44,7 +44,7 @@ export function Footer() {
         <div className="grid grid-cols-2 gap-10 md:grid-cols-5">
           {/* Brand + newsletter */}
           <div className="col-span-2">
-            <Link href="/" className="flex items-center gap-2 font-display text-lg font-semibold tracking-tight">
+            <Link href="/" className="flex items-center gap-2 text-lg font-semibold tracking-tight">
               <span className="flex h-2 w-2 rounded-full bg-primary shadow-[0_0_8px_2px] shadow-primary/60" aria-hidden />
               TECHSTORE
             </Link>
@@ -84,7 +84,7 @@ export function Footer() {
 
           {/* Nav column */}
           <div>
-            <h3 className="font-display text-sm font-semibold">{t("footer.navigate")}</h3>
+            <h3 className="text-sm font-semibold">{t("footer.navigate")}</h3>
             <ul className="mt-4 space-y-3">
               {NAV_LINKS.map((link) => (
                 <li key={link.href}>
@@ -98,7 +98,7 @@ export function Footer() {
 
           {/* Categories column */}
           <div>
-            <h3 className="font-display text-sm font-semibold">{t("footer.categories")}</h3>
+            <h3 className="text-sm font-semibold">{t("footer.categories")}</h3>
             <ul className="mt-4 space-y-3">
               {CATEGORIES.map((c) => (
                 <li key={c.id}>
@@ -115,7 +115,7 @@ export function Footer() {
 
           {/* Social */}
           <div>
-            <h3 className="font-display text-sm font-semibold">{t("footer.follow")}</h3>
+            <h3 className="text-sm font-semibold">{t("footer.follow")}</h3>
             <div className="mt-4 flex gap-2">
               {SOCIALS.map((s) => (
                 <Link
@@ -132,10 +132,10 @@ export function Footer() {
         </div>
 
         <div className="mt-12 flex flex-col items-center justify-between gap-4 border-t border-border pt-8 sm:flex-row">
-          <p className="font-mono text-xs text-muted-foreground">
+          <p className="text-xs text-muted-foreground">
             © {new Date().getFullYear()} TECHSTORE. {t("footer.rights")}
           </p>
-          <div className="flex gap-6 font-mono text-xs text-muted-foreground">
+          <div className="flex gap-6 text-xs text-muted-foreground">
             <Link href="/privacy" className="hover:text-foreground">{t("footer.privacy")}</Link>
             <Link href="/terms" className="hover:text-foreground">{t("footer.terms")}</Link>
           </div>
