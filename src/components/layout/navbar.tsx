@@ -7,13 +7,16 @@ import { Search, ShoppingBag, Heart } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { NAV_LINKS } from "@/data/nav";
 import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
 import { useCart } from "@/hooks/use-cart";
 import { useWishlist } from "@/hooks/use-wishlist";
 import { useHasMounted } from "@/hooks/use-has-mounted";
-import { ThemeToggle } from "./theme-toggle";
+import { useLanguage } from "@/providers/language-provider";
+import { SettingsMenu } from "./settings-menu";
 
 export function Navbar() {
   const pathname = usePathname();
+  const { t } = useLanguage();
   const [scrolled, setScrolled] = React.useState(false);
   const totalItems = useCart((state) => state.totalItems());
   const wishlistCount = useWishlist((state) => state.items.length);
@@ -69,7 +72,7 @@ export function Navbar() {
                   active && "text-foreground"
                 )}
               >
-                {link.label}
+                {t(link.labelKey)}
                 {active && (
                   <span
                     className="absolute -bottom-[1px] left-0 h-[1.5px] w-full bg-primary"
@@ -83,18 +86,24 @@ export function Navbar() {
 
         {/* Actions */}
         <div className="flex items-center gap-1">
-          <Button variant="ghost" size="icon" aria-label="Search products" asChild>
+          <Button variant="ghost" size="icon" aria-label={t("nav.search")} asChild>
             <Link href="/products">
               <Search />
             </Link>
           </Button>
 
-          <ThemeToggle />
+          <SettingsMenu />
+
+          {/* Wishlist/cart are a distinct group from the utility controls
+              above, so a hairline divider separates them instead of just
+              relying on gap spacing. Hidden on mobile — the bottom tab
+              bar covers both there. */}
+          <Separator orientation="vertical" className="mx-1 hidden h-6 md:block" />
 
           <Button
             variant="ghost"
             size="icon"
-            aria-label={`View wishlist, ${displayedWishlistCount} item${displayedWishlistCount === 1 ? "" : "s"}`}
+            aria-label={`${t("nav.wishlist")}, ${displayedWishlistCount}`}
             className="relative hidden md:inline-flex"
             asChild
           >
@@ -112,7 +121,7 @@ export function Navbar() {
           <Button
             variant="ghost"
             size="icon"
-            aria-label={`View cart, ${displayedCartCount} item${displayedCartCount === 1 ? "" : "s"}`}
+            aria-label={`${t("nav.cart")}, ${displayedCartCount}`}
             className="relative hidden md:inline-flex"
             asChild
           >

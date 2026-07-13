@@ -7,25 +7,27 @@ import { motion } from "framer-motion";
 import { Home, Grid3x3, ShoppingBag, Heart, LucideIcon } from "lucide-react";
 import { useCart } from "@/hooks/use-cart";
 import { useWishlist } from "@/hooks/use-wishlist";
+import { useLanguage } from "@/providers/language-provider";
 import { cn } from "@/lib/utils";
 
 interface BottomNavItem {
   href: string;
-  label: string;
+  labelKey: string;
   icon: LucideIcon;
 }
 
 // About/Contact intentionally left off this bar — it's reserved for the
 // core shopping actions; those pages stay reachable via the footer.
 const BOTTOM_NAV_ITEMS: BottomNavItem[] = [
-  { href: "/", label: "Home", icon: Home },
-  { href: "/products", label: "Shop", icon: Grid3x3 },
-  { href: "/wishlist", label: "Wishlist", icon: Heart },
-  { href: "/cart", label: "Cart", icon: ShoppingBag },
+  { href: "/", labelKey: "nav.home", icon: Home },
+  { href: "/products", labelKey: "nav.shop", icon: Grid3x3 },
+  { href: "/wishlist", labelKey: "nav.wishlist", icon: Heart },
+  { href: "/cart", labelKey: "nav.cart", icon: ShoppingBag },
 ];
 
 export function MobileNav() {
   const pathname = usePathname();
+  const { t } = useLanguage();
   const totalItems = useCart((state) => state.totalItems());
   const wishlistCount = useWishlist((state) => state.items.length);
 
@@ -54,7 +56,7 @@ export function MobileNav() {
             <li key={item.href}>
               <Link
                 href={item.href}
-                aria-label={item.label}
+                aria-label={t(item.labelKey)}
                 aria-current={active ? "page" : undefined}
                 className="relative flex flex-col items-center justify-center gap-1 py-2.5 text-muted-foreground transition-colors"
               >
@@ -90,7 +92,7 @@ export function MobileNav() {
                     active && "text-primary"
                   )}
                 >
-                  {item.label}
+                  {t(item.labelKey)}
                 </span>
               </Link>
             </li>

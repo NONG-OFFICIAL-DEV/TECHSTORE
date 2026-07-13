@@ -4,6 +4,7 @@ import { Product } from "@/types/product";
 import { ProductCard } from "@/components/product/product-card";
 import { EmptyState } from "@/components/shared/empty-state";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useLanguage } from "@/providers/language-provider";
 
 interface ProductGridProps {
   products: Product[];
@@ -16,6 +17,8 @@ export function ProductGrid({
   isLoading,
   onClearFilters,
 }: ProductGridProps) {
+  const { t } = useLanguage();
+
   if (isLoading) {
     return (
       <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
@@ -34,9 +37,9 @@ export function ProductGrid({
   if (products.length === 0) {
     return (
       <EmptyState
-        title="No products found"
-        description="Try adjusting your search or filters to find what you're looking for."
-        actionLabel={onClearFilters ? "Clear filters" : undefined}
+        title={t("products.noResultsTitle")}
+        description={t("products.noResultsDesc")}
+        actionLabel={onClearFilters ? t("products.clearFilters") : undefined}
         onAction={onClearFilters}
       />
     );

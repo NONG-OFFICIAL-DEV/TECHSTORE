@@ -49,7 +49,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
     <div className="mx-auto max-w-7xl px-6 md:px-8 py-5">
       <Breadcrumb
         items={[
-          { label: "Products", href: "/products" },
+          { labelKey: "nav.products", href: "/products" },
           { label: product.name },
         ]}
         className="mb-8"

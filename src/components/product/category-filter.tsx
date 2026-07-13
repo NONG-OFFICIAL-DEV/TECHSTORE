@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import { Category } from "@/types/product";
+import { useLanguage } from "@/providers/language-provider";
 import { cn } from "@/lib/utils";
 
 interface CategoryFilterProps {
@@ -17,7 +18,8 @@ export function CategoryFilter({
   onSelect,
   className,
 }: CategoryFilterProps) {
-  const allOption = { slug: undefined, name: "All" };
+  const { t } = useLanguage();
+  const allOption = { slug: undefined, name: "All", nameKey: "products.allCategories" };
   const options = [allOption, ...categories];
 
   return (
@@ -31,7 +33,7 @@ export function CategoryFilter({
 
       <div
         role="group"
-        aria-label="Filter by category"
+        aria-label={t("products.filterByCategory")}
         className={cn(
           // Mobile: single-row horizontal scroll with snap
           "flex gap-2 overflow-x-auto scrollbar-hide snap-x snap-proximity",
@@ -62,7 +64,7 @@ export function CategoryFilter({
                   transition={{ type: "spring", bounce: 0.2, duration: 0.5 }}
                 />
               )}
-              {option.name}
+              {t(option.nameKey)}
             </button>
           );
         })}

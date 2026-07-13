@@ -4,12 +4,14 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Heart } from "lucide-react";
 import { useWishlist } from "@/hooks/use-wishlist";
 import { useHasMounted } from "@/hooks/use-has-mounted";
+import { useLanguage } from "@/providers/language-provider";
 import { ProductCard } from "@/components/product/product-card";
 import { Breadcrumb } from "@/components/shared/breadcrumb";
 import { EmptyState } from "@/components/shared/empty-state";
 import { SectionHeading } from "@/components/shared/section-heading";
 
 export default function WishlistPage() {
+  const { t } = useLanguage();
   const storedItems = useWishlist((state) => state.items);
 
   // Wishlist state comes from localStorage, which the server can't see —
@@ -20,12 +22,12 @@ export default function WishlistPage() {
   if (items.length === 0) {
     return (
       <div className="mx-auto max-w-7xl px-6 md:px-8 py-5">
-        <Breadcrumb items={[{ label: "Wishlist" }]} className="mb-8" />
+        <Breadcrumb items={[{ label: t("nav.wishlist") }]} className="mb-8" />
         <EmptyState
           icon={Heart}
-          title="Your wishlist is empty"
-          description="Save products you're interested in by tapping the heart icon."
-          actionLabel="Browse Products"
+          title={t("wishlist.emptyTitle")}
+          description={t("wishlist.emptyDesc")}
+          actionLabel={t("common.browseProducts")}
           onAction={() => (window.location.href = "/products")}
         />
       </div>
@@ -34,11 +36,14 @@ export default function WishlistPage() {
 
   return (
     <div className="mx-auto max-w-7xl px-6 md:px-8 py-5">
-      <Breadcrumb items={[{ label: "Wishlist" }]} className="mb-8" />
+      <Breadcrumb items={[{ label: t("nav.wishlist") }]} className="mb-8" />
 
       <SectionHeading
-        title="Your Wishlist"
-        description={`${items.length} item${items.length !== 1 ? "s" : ""} saved`}
+        title={t("wishlist.title")}
+        description={t(
+          items.length === 1 ? "wishlist.itemCountOne" : "wishlist.itemCountOther",
+          { count: items.length }
+        )}
         className="mb-8 md:mb-12"
       />
 

@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { Search, X } from "lucide-react";
 import { Input } from "@/components/ui/input";
+import { useLanguage } from "@/providers/language-provider";
 import { cn } from "@/lib/utils";
 
 interface SearchBarProps {
@@ -15,9 +16,10 @@ interface SearchBarProps {
 export function SearchBar({
   value,
   onChange,
-  placeholder = "Search products…",
+  placeholder,
   className,
 }: SearchBarProps) {
+  const { t } = useLanguage();
   const [localValue, setLocalValue] = useState(value);
 
   // Debounce input to avoid filtering on every keystroke
@@ -40,14 +42,14 @@ export function SearchBar({
         type="text"
         value={localValue}
         onChange={(e) => setLocalValue(e.target.value)}
-        placeholder={placeholder}
+        placeholder={placeholder ?? t("products.searchPlaceholder")}
         className="pl-10 pr-9"
-        aria-label="Search products"
+        aria-label={t("nav.search")}
       />
       {localValue && (
         <button
           onClick={() => setLocalValue("")}
-          aria-label="Clear search"
+          aria-label={t("products.clearSearch")}
           className="absolute right-3 top-1/2 z-10 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
         >
           <X className="h-4 w-4" />

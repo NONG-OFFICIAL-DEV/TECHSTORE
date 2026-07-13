@@ -3,6 +3,7 @@
 import { motion } from "framer-motion";
 import { Star, Quote } from "lucide-react";
 import { SectionHeading } from "@/components/shared/section-heading";
+import { useLanguage } from "@/providers/language-provider";
 
 interface Testimonial {
   id: string;
@@ -44,13 +45,15 @@ const testimonials: Testimonial[] = [
 ];
 
 export function Testimonials() {
+  const { t } = useLanguage();
+
   return (
     <section className="border-y border-border/60 bg-card/20">
       <div className="mx-auto max-w-7xl px-6 md:px-8 py-16 md:py-24">
         <SectionHeading
-          eyebrow="Testimonials"
-          title="Loved by our customers"
-          description="Real feedback from people who use our products every day."
+          eyebrow={t("home.testimonialsEyebrow")}
+          title={t("home.testimonialsTitle")}
+          description={t("home.testimonialsDesc")}
           align="center"
         />
 

@@ -10,12 +10,14 @@ import { Separator } from "@/components/ui/separator";
 import { useCart } from "@/hooks/use-cart";
 import { useWishlist } from "@/hooks/use-wishlist";
 import { useHasMounted } from "@/hooks/use-has-mounted";
+import { useLanguage } from "@/providers/language-provider";
 import { cn, formatPrice } from "@/lib/utils";
 interface ProductInfoProps {
   product: Product;
 }
 
 export function ProductInfo({ product }: ProductInfoProps) {
+  const { t } = useLanguage();
   const [selectedColor, setSelectedColor] = useState(product.colors?.[0]?.name);
   const [quantity, setQuantity] = useState(1);
   const [isAdding, setIsAdding] = useState(false);
@@ -64,7 +66,7 @@ export function ProductInfo({ product }: ProductInfoProps) {
           <p className="text-sm font-medium text-muted-foreground uppercase tracking-wide">
             {product.brand}
           </p>
-          {product.isNew && <Badge>New</Badge>}
+          {product.isNew && <Badge>{t("products.newBadge")}</Badge>}
         </div>
         <h1 className="text-2xl md:text-3xl font-bold text-foreground tracking-tight">
           {product.name}
@@ -88,7 +90,7 @@ export function ProductInfo({ product }: ProductInfoProps) {
             {product.rating}
           </span>
           <span className="text-sm text-muted-foreground">
-            ({product.reviewCount} reviews)
+            ({product.reviewCount} {t("productDetail.reviews")})
           </span>
         </div>
       </div>
@@ -120,7 +122,7 @@ export function ProductInfo({ product }: ProductInfoProps) {
       {product.colors && product.colors.length > 0 && (
         <div>
           <p className="text-sm font-medium text-foreground mb-3">
-            Color — <span className="text-muted-foreground">{selectedColor}</span>
+            {t("productDetail.color")} — <span className="text-muted-foreground">{selectedColor}</span>
           </p>
           <div className="flex gap-2.5">
             {product.colors.map((color) => (
@@ -159,7 +161,7 @@ export function ProductInfo({ product }: ProductInfoProps) {
         <div className="flex items-center rounded-lg border border-border/60">
           <button
             onClick={() => setQuantity((q) => Math.max(1, q - 1))}
-            aria-label="Decrease quantity"
+            aria-label={t("common.decreaseQuantity")}
             className="p-3 hover:text-primary transition-colors"
           >
             <Minus className="h-3.5 w-3.5" />
@@ -169,7 +171,7 @@ export function ProductInfo({ product }: ProductInfoProps) {
           </span>
           <button
             onClick={() => setQuantity((q) => q + 1)}
-            aria-label="Increase quantity"
+            aria-label={t("common.increaseQuantity")}
             className="p-3 hover:text-primary transition-colors"
           >
             <Plus className="h-3.5 w-3.5" />
@@ -184,16 +186,16 @@ export function ProductInfo({ product }: ProductInfoProps) {
         >
           {isAdding ? (
             <>
-              <Loader2 className="h-4 w-4 animate-spin" /> Adding...
+              <Loader2 className="h-4 w-4 animate-spin" /> {t("common.adding")}
             </>
           ) : justAdded ? (
             <>
-              <Check className="h-4 w-4" /> Added to Cart
+              <Check className="h-4 w-4" /> {t("common.addedToCart")}
             </>
           ) : (
             <>
               <ShoppingCart className="h-4 w-4" />
-              {product.inStock ? "Add to Cart" : "Out of Stock"}
+              {product.inStock ? t("common.addToCart") : t("common.outOfStock")}
             </>
           )}
         </Button>
@@ -203,7 +205,9 @@ export function ProductInfo({ product }: ProductInfoProps) {
           size="icon"
           variant="outline"
           onClick={() => toggleWishlist(product)}
-          aria-label={isWishlisted ? "Remove from wishlist" : "Add to wishlist"}
+          aria-label={t(
+            isWishlisted ? "productDetail.removeFromWishlist" : "productDetail.addToWishlist"
+          )}
           aria-pressed={isWishlisted}
           className="h-12 w-12 shrink-0"
         >
@@ -213,7 +217,7 @@ export function ProductInfo({ product }: ProductInfoProps) {
 
       {product.inStock && product.stockCount && product.stockCount < 20 && (
         <p className="text-xs text-primary font-medium">
-          Only {product.stockCount} left in stock — order soon.
+          {t("productDetail.onlyLeftInStock", { count: product.stockCount })}
         </p>
       )}
 
@@ -222,7 +226,7 @@ export function ProductInfo({ product }: ProductInfoProps) {
       {/* Specifications */}
       <div>
         <h3 className="text-sm font-semibold text-foreground mb-4">
-          Specifications
+          {t("productDetail.specifications")}
         </h3>
         <dl className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-3">
           {Object.entries(product.specs).map(([key, value]) => (

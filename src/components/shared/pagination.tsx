@@ -2,6 +2,7 @@
 
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useLanguage } from "@/providers/language-provider";
 import { cn } from "@/lib/utils";
 
 interface PaginationProps {
@@ -17,6 +18,8 @@ export function Pagination({
   onPageChange,
   className,
 }: PaginationProps) {
+  const { t } = useLanguage();
+
   if (totalPages <= 1) return null;
 
   const getPageNumbers = () => {
@@ -39,7 +42,7 @@ export function Pagination({
 
   return (
     <nav
-      aria-label="Pagination"
+      aria-label={t("products.pagination")}
       className={cn("flex items-center justify-center gap-1.5", className)}
     >
       <Button
@@ -47,7 +50,7 @@ export function Pagination({
         size="icon"
         disabled={currentPage === 1}
         onClick={() => onPageChange(currentPage - 1)}
-        aria-label="Previous page"
+        aria-label={t("products.previousPage")}
       >
         <ChevronLeft className="h-4 w-4" />
       </Button>
@@ -66,7 +69,7 @@ export function Pagination({
             variant={page === currentPage ? "default" : "outline"}
             size="icon"
             onClick={() => onPageChange(page)}
-            aria-label={`Go to page ${page}`}
+            aria-label={t("products.goToPage", { page })}
             aria-current={page === currentPage ? "page" : undefined}
           >
             {page}
@@ -79,7 +82,7 @@ export function Pagination({
         size="icon"
         disabled={currentPage === totalPages}
         onClick={() => onPageChange(currentPage + 1)}
-        aria-label="Next page"
+        aria-label={t("products.nextPage")}
       >
         <ChevronRight className="h-4 w-4" />
       </Button>

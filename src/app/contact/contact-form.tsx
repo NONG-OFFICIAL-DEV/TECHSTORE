@@ -5,10 +5,12 @@ import { motion } from "framer-motion";
 import { Loader2, Send, CheckCircle2, AlertCircle } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { useLanguage } from "@/providers/language-provider";
 
 type Status = "idle" | "submitting" | "success" | "error";
 
 export function ContactForm() {
+  const { t } = useLanguage();
   const [status, setStatus] = useState<Status>("idle");
   const [form, setForm] = useState({ name: "", email: "", message: "" });
 
@@ -42,18 +44,17 @@ export function ContactForm() {
       >
         <CheckCircle2 className="h-10 w-10 text-primary mb-4" />
         <h3 className="text-lg font-semibold text-foreground">
-          Message sent
+          {t("contact.sentTitle")}
         </h3>
         <p className="text-sm text-muted-foreground mt-2 max-w-xs">
-          Thanks for reaching out — we&apos;ll get back to you within one
-          business day.
+          {t("contact.sentDesc")}
         </p>
         <Button
           variant="outline"
           className="mt-6"
           onClick={() => setStatus("idle")}
         >
-          Send another message
+          {t("contact.sendAnother")}
         </Button>
       </motion.div>
     );
@@ -67,20 +68,20 @@ export function ContactForm() {
       <div className="grid sm:grid-cols-2 gap-5">
         <div>
           <label htmlFor="name" className="text-sm font-medium text-foreground">
-            Name
+            {t("contact.nameLabel")}
           </label>
           <Input
             id="name"
             required
             value={form.name}
             onChange={(e) => setForm({ ...form, name: e.target.value })}
-            placeholder="Jane Doe"
+            placeholder={t("contact.namePlaceholder")}
             className="mt-1.5"
           />
         </div>
         <div>
           <label htmlFor="email" className="text-sm font-medium text-foreground">
-            Email
+            {t("contact.emailFieldLabel")}
           </label>
           <Input
             id="email"
@@ -88,7 +89,7 @@ export function ContactForm() {
             required
             value={form.email}
             onChange={(e) => setForm({ ...form, email: e.target.value })}
-            placeholder="jane@example.com"
+            placeholder={t("contact.emailPlaceholder")}
             className="mt-1.5"
           />
         </div>
@@ -96,7 +97,7 @@ export function ContactForm() {
 
       <div>
         <label htmlFor="message" className="text-sm font-medium text-foreground">
-          Message
+          {t("contact.messageLabel")}
         </label>
         <textarea
           id="message"
@@ -104,7 +105,7 @@ export function ContactForm() {
           rows={6}
           value={form.message}
           onChange={(e) => setForm({ ...form, message: e.target.value })}
-          placeholder="How can we help?"
+          placeholder={t("contact.messagePlaceholder")}
           className="mt-1.5 flex w-full rounded-lg border border-border/60 bg-background/60 px-4 py-3 text-sm backdrop-blur-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:border-primary/50 resize-none"
         />
       </div>
@@ -115,7 +116,7 @@ export function ContactForm() {
           className="flex items-start gap-2.5 rounded-xl border border-destructive/40 bg-destructive/5 px-4 py-3 text-sm text-destructive"
         >
           <AlertCircle className="h-4 w-4 shrink-0 mt-0.5" />
-          <span>Something went wrong sending your message. Please try again.</span>
+          <span>{t("contact.errorGeneric")}</span>
         </div>
       )}
 
@@ -127,11 +128,11 @@ export function ContactForm() {
       >
         {status === "submitting" ? (
           <>
-            <Loader2 className="h-4 w-4 animate-spin" /> Sending…
+            <Loader2 className="h-4 w-4 animate-spin" /> {t("contact.sending")}
           </>
         ) : (
           <>
-            <Send className="h-4 w-4" /> Send Message
+            <Send className="h-4 w-4" /> {t("contact.send")}
           </>
         )}
       </Button>

@@ -19,7 +19,9 @@ import { useCart } from "@/hooks/use-cart";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Breadcrumb } from "@/components/shared/breadcrumb";
+import { SectionHeading } from "@/components/shared/section-heading";
 import { LocationLinkInput } from "@/components/checkout/location-link-input";
+import { useLanguage } from "@/providers/language-provider";
 import { cn, formatPrice } from "@/lib/utils";
 
 // ------------------------------------------------------------------
@@ -61,11 +63,13 @@ const PROVINCES: { province: string; districts: string[] }[] = [
 // Step indicator
 // ------------------------------------------------------------------
 const STEPS = [
-  { id: 1, label: "Delivery" },
-  { id: 2, label: "Review & Payment" },
+  { id: 1, labelKey: "checkout.stepDelivery" },
+  { id: 2, labelKey: "checkout.stepReview" },
 ] as const;
 
 function StepIndicator({ current }: { current: number }) {
+  const { t } = useLanguage();
+
   return (
     <ol className="flex items-center w-full mb-0" aria-label="Checkout progress">
       {STEPS.map((step, i) => {
@@ -91,7 +95,7 @@ function StepIndicator({ current }: { current: number }) {
                   isActive || isDone ? "text-foreground" : "text-muted-foreground"
                 )}
               >
-                {step.label}
+                {t(step.labelKey)}
               </span>
             </div>
             {i < STEPS.length - 1 && (
@@ -130,6 +134,7 @@ function StepErrorBanner({ message }: { message: string }) {
 }
 
 export default function CheckoutPage() {
+  const { t } = useLanguage();
   const items = useCart((state) => state.items);
   const subtotal = useCart((state) => state.totalPrice());
   const clearCart = useCart((state) => state.clearCart);
@@ -189,19 +194,19 @@ export default function CheckoutPage() {
 
   const handleNextFromDelivery = () => {
     if (!fullName.trim() || !phone.trim()) {
-      setStepError("Please enter your name and phone number.");
+      setStepError(t("checkout.errorMissingNamePhone"));
       return;
     }
     if (location === "phnom_penh" && !coords && !address.trim()) {
-      setStepError("Paste your Google Maps link or type your address so the rider can find you.");
+      setStepError(t("checkout.errorLocation"));
       return;
     }
     if (location === "province" && !selectedProvince) {
-      setStepError("Please select your province.");
+      setStepError(t("checkout.errorProvince"));
       return;
     }
     if (location === "province" && !selectedDistrict) {
-      setStepError("Please select your district so we can match you with a courier.");
+      setStepError(t("checkout.errorDistrict"));
       return;
     }
     goToStep(2);
@@ -249,7 +254,7 @@ export default function CheckoutPage() {
       clearCart();
     } catch (error) {
       console.error(error);
-      setSubmitError("Something went wrong placing your order. Please try again.");
+      setSubmitError(t("checkout.errorSubmit"));
       setIsSubmitting(false);
     }
   };
@@ -260,17 +265,17 @@ export default function CheckoutPage() {
         <div className="h-16 w-16 bg-emerald-500/10 rounded-full flex items-center justify-center text-emerald-500 mb-6">
           <CheckCircle2 className="h-10 w-10" />
         </div>
-        <h1 className="text-2xl font-bold">សូមអរគុណ! Order Placed!</h1>
+        <h1 className="text-2xl font-bold">{t("checkout.orderPlacedTitle")}</h1>
         {orderNumber && (
           <p className="mt-4 rounded-lg border border-border/60 bg-card/40 px-4 py-2 font-mono text-sm font-semibold text-foreground">
-            Order #{orderNumber}
+            {t("checkout.orderNumberLabel", { number: orderNumber })}
           </p>
         )}
         <p className="mt-3 text-sm text-muted-foreground leading-relaxed">
-          Your order has been registered. Please send your payment screenshot to our Telegram channel or page inbox, referencing your order number, to confirm fulfillment.
+          {t("checkout.orderPlacedDesc")}
         </p>
         <Button asChild className="mt-8 w-full">
-          <Link href="/products">Continue Shopping</Link>
+          <Link href="/products">{t("common.continueShopping")}</Link>
         </Button>
       </div>
     );
@@ -279,9 +284,9 @@ export default function CheckoutPage() {
   if (items.length === 0) {
     return (
       <div className="mx-auto max-w-7xl px-6 md:px-8 py-12 text-center">
-        <h1 className="text-xl font-bold">Your cart is empty</h1>
+        <h1 className="text-xl font-bold">{t("cart.emptyTitle")}</h1>
         <Button asChild className="mt-4">
-          <Link href="/products">Go to Products</Link>
+          <Link href="/products">{t("checkout.goToProducts")}</Link>
         </Button>
       </div>
     );
@@ -289,11 +294,16 @@ export default function CheckoutPage() {
 
   return (
     <div className="mx-auto max-w-7xl px-6 md:px-8 py-5">
-      <Breadcrumb items={[{ label: "Cart", href: "/cart" }, { label: "Checkout" }]} className="mb-8" />
-
-      <div className="mb-2">
-        <h1 className="text-3xl font-bold tracking-tight mt-2">Secure Checkout</h1>
-      </div>
+      <Breadcrumb
+        items={[
+          { label: t("checkout.breadcrumbCart"), href: "/cart" },
+          { label: t("checkout.breadcrumbCheckout") },
+        ]}
+        className="mb-8"
+      />
+      <SectionHeading
+        title={t("checkout.title")}
+      />
 
       <div className="grid lg:grid-cols-12 gap-8 lg:gap-12 items-start">
         <form onSubmit={handleSubmitOrder} className="lg:col-span-7 flex flex-col gap-6">
@@ -314,36 +324,36 @@ export default function CheckoutPage() {
               >
                 <div className="rounded-2xl border border-border/60 bg-card/40 backdrop-blur-sm p-6">
                   <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
-                    <Truck className="h-5 w-5 text-primary" /> Delivery Information
+                    <Truck className="h-5 w-5 text-primary" /> {t("checkout.deliveryInfo")}
                   </h2>
 
                   <div className="grid grid-cols-2 gap-4">
                     <div className="col-span-2">
-                      <label className="text-xs font-medium text-muted-foreground">Full Name</label>
+                      <label className="text-xs font-medium text-muted-foreground">{t("checkout.fullName")}</label>
                       <input
                         required
                         value={fullName}
                         onChange={(e) => setFullName(e.target.value)}
                         type="text"
-                        placeholder="e.g. Sok Chan"
+                        placeholder={t("checkout.fullNamePlaceholder")}
                         className="mt-1 w-full rounded-xl border border-border bg-background px-4 py-2.5 text-base sm:text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
                       />
                     </div>
                     <div className="col-span-2">
-                      <label className="text-xs font-medium text-muted-foreground">Phone Number (Telegram)</label>
+                      <label className="text-xs font-medium text-muted-foreground">{t("checkout.phone")}</label>
                       <input
                         required
                         value={phone}
                         onChange={(e) => setPhone(e.target.value)}
                         type="tel"
-                        placeholder="e.g. 092 123 456"
+                        placeholder={t("checkout.phonePlaceholder")}
                         className="mt-1 w-full rounded-xl border border-border bg-background px-4 py-2.5 text-base sm:text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
                       />
                     </div>
 
                     {/* Destination Sector Toggle */}
                     <div className="col-span-2 mt-2">
-                      <label className="text-xs font-medium text-muted-foreground block mb-2">Delivery Region</label>
+                      <label className="text-xs font-medium text-muted-foreground block mb-2">{t("checkout.deliveryRegion")}</label>
                       <div className="grid grid-cols-2 gap-3">
                         <button
                           type="button"
@@ -355,7 +365,7 @@ export default function CheckoutPage() {
                               : "border-border hover:bg-muted/30"
                           )}
                         >
-                          Phnom Penh
+                          {t("checkout.phnomPenh")}
                         </button>
                         <button
                           type="button"
@@ -367,7 +377,7 @@ export default function CheckoutPage() {
                               : "border-border hover:bg-muted/30"
                           )}
                         >
-                          Provinces
+                          {t("checkout.provinces")}
                         </button>
                       </div>
                     </div>
@@ -376,13 +386,13 @@ export default function CheckoutPage() {
                     {location === LOCATION_PHNOM_PENH && (
                       <div className="col-span-2 mt-2">
                         <label className="text-xs font-medium text-muted-foreground block mb-2">
-                          Share Your Location
+                          {t("checkout.shareLocation")}
                         </label>
                         <LocationLinkInput value={coords} onChange={setCoords} />
                         <p className="mt-2 text-xs text-muted-foreground">
                           {coords
-                            ? "Rider will navigate directly to this pin. You can still add landmark notes below."
-                            : "Fastest way for Grab/J&T riders to find you — or type your address below instead."}
+                            ? t("checkout.locationHintPin")
+                            : t("checkout.locationHintNoPin")}
                         </p>
                       </div>
                     )}
@@ -392,7 +402,7 @@ export default function CheckoutPage() {
                       <div className="col-span-2 mt-2 flex flex-col gap-4">
                         <div>
                           <label className="text-xs font-medium text-muted-foreground block mb-2">
-                            Your Province
+                            {t("checkout.yourProvince")}
                           </label>
                           <select
                             required
@@ -401,7 +411,7 @@ export default function CheckoutPage() {
                             className="w-full rounded-xl border border-border bg-background px-4 py-2.5 text-base sm:text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
                           >
                             <option value="" disabled>
-                              Select your province…
+                              {t("checkout.selectProvince")}
                             </option>
                             {PROVINCES.map((p) => (
                               <option key={p.province} value={p.province}>
@@ -414,7 +424,7 @@ export default function CheckoutPage() {
                         {selectedProvince && (
                           <div>
                             <label className="text-xs font-medium text-muted-foreground block mb-2">
-                              Your District
+                              {t("checkout.yourDistrict")}
                             </label>
                             <select
                               required
@@ -426,7 +436,7 @@ export default function CheckoutPage() {
                               className="w-full rounded-xl border border-border bg-background px-4 py-2.5 text-base sm:text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
                             >
                               <option value="" disabled>
-                                Select your district…
+                                {t("checkout.selectDistrict")}
                               </option>
                               {PROVINCES.find((p) => p.province === selectedProvince)?.districts.map((d) => (
                                 <option key={d} value={d}>
@@ -442,15 +452,15 @@ export default function CheckoutPage() {
                     <div className="col-span-2">
                       <label className="text-xs font-medium text-muted-foreground">
                         {location === LOCATION_PHNOM_PENH
-                          ? "Landmark / Address Notes (optional if location shared)"
-                          : "Home Address Details (for doorstep delivery)"}
+                          ? t("checkout.addressNotesPP")
+                          : t("checkout.addressNotesProvince")}
                       </label>
                       <textarea
                         required={location === LOCATION_PROVINCE || !coords}
                         value={address}
                         onChange={(e) => setAddress(e.target.value)}
                         rows={3}
-                        placeholder="House number, Street name, Sangkat or Province/District details..."
+                        placeholder={t("checkout.addressPlaceholder")}
                         className="mt-1 w-full rounded-xl border border-border bg-background px-4 py-2.5 text-base sm:text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 resize-none"
                       />
                     </div>
@@ -468,7 +478,7 @@ export default function CheckoutPage() {
                     className="rounded-2xl border border-border/60 bg-card/40 backdrop-blur-sm p-6"
                   >
                     <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
-                      <Truck className="h-5 w-5 text-primary" /> Choose Delivery Company
+                      <Truck className="h-5 w-5 text-primary" /> {t("checkout.chooseDeliveryCompany")}
                     </h2>
                     <div className="flex flex-col gap-2.5">
                       {SHIPPING_METHODS[location].map((method) => (
@@ -496,7 +506,7 @@ export default function CheckoutPage() {
                 {stepError && <StepErrorBanner message={stepError} />}
 
                 <Button type="button" size="lg" onClick={handleNextFromDelivery} className="w-full h-12 text-base">
-                  Continue to Review &amp; Payment <ArrowRight className="h-4 w-4" />
+                  {t("checkout.continueToReview")} <ArrowRight className="h-4 w-4" />
                 </Button>
               </motion.div>
             )}
@@ -516,26 +526,26 @@ export default function CheckoutPage() {
                 {/* Delivery summary — read-only recap, editable via link */}
                 <div className="rounded-2xl border border-border/60 bg-card/40 backdrop-blur-sm p-6 flex flex-col gap-4">
                   <h2 className="text-lg font-semibold flex items-center gap-2">
-                    <Truck className="h-5 w-5 text-primary" /> Delivery Summary
+                    <Truck className="h-5 w-5 text-primary" /> {t("checkout.deliverySummary")}
                   </h2>
 
                   <div className="grid grid-cols-2 gap-x-3 gap-y-3 text-sm">
-                    <span className="text-muted-foreground">Name</span>
+                    <span className="text-muted-foreground">{t("checkout.name")}</span>
                     <span className="text-right font-medium truncate">{fullName}</span>
 
-                    <span className="text-muted-foreground">Phone</span>
+                    <span className="text-muted-foreground">{t("checkout.phoneLabel")}</span>
                     <span className="text-right font-medium truncate">{phone}</span>
 
-                    <span className="text-muted-foreground">Region</span>
+                    <span className="text-muted-foreground">{t("checkout.region")}</span>
                     <span className="text-right font-medium truncate">
                       {location === LOCATION_PHNOM_PENH
-                        ? "Phnom Penh"
+                        ? t("checkout.phnomPenh")
                         : `${selectedDistrict}, ${selectedProvince}`}
                     </span>
 
                     {location === LOCATION_PHNOM_PENH && coords && (
                       <>
-                        <span className="text-muted-foreground">Pinned location</span>
+                        <span className="text-muted-foreground">{t("checkout.pinnedLocation")}</span>
                         <span className="text-right">
                           <a
                             href={`https://www.google.com/maps?q=${coords.lat},${coords.lng}`}
@@ -543,19 +553,19 @@ export default function CheckoutPage() {
                             rel="noopener noreferrer"
                             className="font-medium text-primary underline underline-offset-2"
                           >
-                            View on map
+                            {t("checkout.viewOnMap")}
                           </a>
                         </span>
                       </>
                     )}
 
-                    <span className="text-muted-foreground">Delivery company</span>
+                    <span className="text-muted-foreground">{t("checkout.deliveryCompany")}</span>
                     <span className="text-right font-medium truncate">{selectedShipping.name}</span>
                   </div>
 
                   {address && (
                     <div className="pt-2 border-t border-border/60">
-                      <p className="text-xs text-muted-foreground mb-1">Address notes</p>
+                      <p className="text-xs text-muted-foreground mb-1">{t("checkout.addressNotesShort")}</p>
                       <p className="text-sm break-words">{address}</p>
                     </div>
                   )}
@@ -565,14 +575,14 @@ export default function CheckoutPage() {
                     onClick={() => goToStep(1)}
                     className="self-start text-xs font-medium text-primary underline underline-offset-2"
                   >
-                    Edit delivery info
+                    {t("checkout.editDeliveryInfo")}
                   </button>
                 </div>
 
                 {/* Payment method */}
                 <div className="rounded-2xl border border-border/60 bg-card/40 backdrop-blur-sm p-6">
                   <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
-                    <Landmark className="h-5 w-5 text-primary" /> Payment Method
+                    <Landmark className="h-5 w-5 text-primary" /> {t("checkout.paymentMethod")}
                   </h2>
 
                   <div className="grid grid-cols-2 gap-2 sm:gap-3 mb-6">
@@ -587,7 +597,7 @@ export default function CheckoutPage() {
                     >
                       <QrCode className="h-6 w-6" />
                       <span className="text-[11px] sm:text-xs font-bold uppercase tracking-wider">
-                        Bakong KHQR
+                        {t("checkout.khqr")}
                       </span>
                     </div>
                     <div
@@ -601,7 +611,7 @@ export default function CheckoutPage() {
                     >
                       <Landmark className="h-6 w-6" />
                       <span className="text-[11px] sm:text-xs font-bold uppercase tracking-wider">
-                        ABA Mobile Bank
+                        {t("checkout.aba")}
                       </span>
                     </div>
                   </div>
@@ -615,23 +625,20 @@ export default function CheckoutPage() {
                           </div>
                         </div>
                         <p className="text-xs text-muted-foreground max-w-xs break-words">
-                          Scan using Bakong or any Cambodian Banking App to auto-pay{" "}
-                          <span className="font-semibold text-foreground">{formatPrice(total)}</span>
+                          {t("checkout.khqrScanHint", { amount: formatPrice(total) })}
                         </p>
                       </>
                     ) : (
                       <div className="w-full text-left space-y-2">
                         <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                          Our Official Bank Account
+                          {t("checkout.bankAccountLabel")}
                         </p>
                         <div className="p-3 bg-background border rounded-lg">
-                          <p className="text-sm font-bold text-foreground break-words">ABA Bank (000 123 456)</p>
-                          <p className="text-xs text-muted-foreground mt-0.5 break-words">Account Name: NOVA COMMERCE CO., LTD.</p>
+                          <p className="text-sm font-bold text-foreground break-words">{t("checkout.bankAccountName")}</p>
+                          <p className="text-xs text-muted-foreground mt-0.5 break-words">{t("checkout.bankAccountOwner")}</p>
                         </div>
                         <p className="text-xs text-muted-foreground pt-1 break-words">
-                          Please transfer exactly{" "}
-                          <span className="font-semibold text-foreground">{formatPrice(total)}</span> into the account
-                          above.
+                          {t("checkout.bankTransferHint", { amount: formatPrice(total) })}
                         </p>
                       </div>
                     )}
@@ -644,15 +651,15 @@ export default function CheckoutPage() {
 
                 <div className="flex flex-col gap-3 sm:flex-row">
                   <Button type="button" variant="outline" size="lg" onClick={() => goToStep(1)} className="w-full sm:flex-1 h-12">
-                    <ArrowLeft className="h-4 w-4" /> Back
+                    <ArrowLeft className="h-4 w-4" /> {t("common.back")}
                   </Button>
                   <Button type="submit" size="lg" disabled={isSubmitting} className="w-full sm:flex-1 h-12 text-base">
-                    {isSubmitting ? "Registering order..." : "Confirm & Complete Order"}
+                    {isSubmitting ? t("checkout.registeringOrder") : t("checkout.confirmOrder")}
                   </Button>
                 </div>
 
                 <p className="flex items-center justify-center gap-1 text-xs text-muted-foreground text-center">
-                  <ShieldCheck className="h-3.5 w-3.5 text-emerald-500 shrink-0" /> Direct encrypted verification logic.
+                  <ShieldCheck className="h-3.5 w-3.5 text-emerald-500 shrink-0" /> {t("checkout.secureNote")}
                 </p>
               </motion.div>
             )}
@@ -662,7 +669,7 @@ export default function CheckoutPage() {
         {/* Sticky Review Panel */}
         <div className="lg:col-span-5 lg:sticky lg:top-24 flex flex-col gap-4">
           <div className="rounded-2xl border border-border/60 bg-card/40 backdrop-blur-sm p-6">
-            <h2 className="text-lg font-semibold mb-4">Review Items</h2>
+            <h2 className="text-lg font-semibold mb-4">{t("checkout.reviewItems")}</h2>
 
             <div className="max-h-[220px] overflow-y-auto pr-1 flex flex-col gap-3 mb-4">
               {items.map((item) => (
@@ -672,7 +679,7 @@ export default function CheckoutPage() {
                   </div>
                   <div className="flex-1 min-w-0 text-sm">
                     <h4 className="font-medium text-foreground line-clamp-1">{item.product.name}</h4>
-                    <p className="text-xs text-muted-foreground">Qty: {item.quantity}</p>
+                    <p className="text-xs text-muted-foreground">{t("checkout.qty", { count: item.quantity })}</p>
                   </div>
                   <span className="text-sm font-semibold shrink-0">{formatPrice(item.product.price * item.quantity)}</span>
                 </div>
@@ -683,11 +690,11 @@ export default function CheckoutPage() {
 
             <div className="flex flex-col gap-2 text-sm">
               <div className="flex justify-between gap-2 text-muted-foreground">
-                <span>Subtotal</span>
+                <span>{t("cart.subtotal")}</span>
                 <span className="text-foreground font-medium shrink-0">{formatPrice(subtotal)}</span>
               </div>
               <div className="flex justify-between items-baseline gap-2 text-muted-foreground">
-                <span className="truncate">Delivery Via ({selectedShipping.name})</span>
+                <span className="truncate">{t("checkout.deliveryVia", { name: selectedShipping.name })}</span>
                 <span className="text-foreground font-medium shrink-0">{formatPrice(selectedShipping.cost)}</span>
               </div>
             </div>
@@ -695,7 +702,7 @@ export default function CheckoutPage() {
             <Separator className="my-4" />
 
             <div className="flex justify-between items-center gap-2">
-              <span className="font-semibold">Total to Pay</span>
+              <span className="font-semibold">{t("checkout.totalToPay")}</span>
               <span className="text-2xl font-bold text-primary shrink-0">{formatPrice(total)}</span>
             </div>
           </div>

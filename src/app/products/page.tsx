@@ -11,10 +11,12 @@ import { SortDropdown } from "@/components/product/sort-dropdown";
 import { Pagination } from "@/components/shared/pagination";
 import { Breadcrumb } from "@/components/shared/breadcrumb";
 import { SectionHeading } from "@/components/shared/section-heading";
+import { useLanguage } from "@/providers/language-provider";
 
 const PAGE_SIZE = 8;
 
 export default function ProductsPage() {
+  const { t } = useLanguage();
   const searchParams = useSearchParams();
   const initialCategory = searchParams.get("category") ?? undefined;
 
@@ -101,10 +103,13 @@ export default function ProductsPage() {
 
   return (
     <div className="mx-auto max-w-7xl px-6 md:px-8 py-5">
-      <Breadcrumb items={[{ label: "Products" }]} className="mb-8" />
+      <Breadcrumb items={[{ label: t("nav.products") }]} className="mb-8" />
       <SectionHeading
-        title="All Products"
-        description={`${filtered.length} product${filtered.length !== 1 ? "s" : ""} found`}
+        title={t("products.title")}
+        description={t(
+          filtered.length === 1 ? "products.countFoundOne" : "products.countFoundOther",
+          { count: filtered.length }
+        )}
       />
 
       <CategoryFilter

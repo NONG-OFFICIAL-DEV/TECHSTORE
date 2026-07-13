@@ -4,8 +4,11 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useLanguage } from "@/providers/language-provider";
 
 export function CtaSection() {
+  const { t } = useLanguage();
+
   return (
     <section className="mx-auto max-w-7xl px-6 md:px-8 py-16 md:py-24">
       <motion.div
@@ -20,15 +23,14 @@ export function CtaSection() {
         </div>
 
         <h2 className="text-3xl md:text-4xl font-bold tracking-tight text-foreground max-w-2xl mx-auto">
-          Ready to upgrade your setup?
+          {t("home.ctaTitle")}
         </h2>
         <p className="mt-4 text-muted-foreground max-w-lg mx-auto leading-relaxed">
-          Explore the full collection and find the device that fits how you
-          work, train, and live.
+          {t("home.ctaDesc")}
         </p>
         <Button size="lg" asChild className="mt-8 gap-2">
           <Link href="/products">
-            Browse All Products <ArrowRight className="h-4 w-4" />
+            {t("home.ctaButton")} <ArrowRight className="h-4 w-4" />
           </Link>
         </Button>
       </motion.div>

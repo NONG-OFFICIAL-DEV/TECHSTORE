@@ -97,7 +97,7 @@
   --color-ring: var(--ring);
 
   --font-display: var(--font-space-grotesk);
-  --font-sans: var(--font-inter);
+  --font-sans: 'Google Sans', var(--font-poppins), var(--font-noto-khmer), Arial, sans-serif;
   --font-mono: var(--font-jetbrains-mono);
 
   /* ---------------------------------------------------------------- */

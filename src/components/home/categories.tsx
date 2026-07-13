@@ -7,6 +7,7 @@ import { categories } from "@/data/products";
 import { Container } from "@/components/shared/container";
 import { cn } from "@/lib/utils";
 import { SectionHeading } from "@/components/shared/section-heading";
+import { useLanguage } from "@/providers/language-provider";
 
 const ICON_MAP: Record<string, LucideIcon> = {
   Headphones,
@@ -16,13 +17,15 @@ const ICON_MAP: Record<string, LucideIcon> = {
 };
 
 export function Categories() {
+  const { t } = useLanguage();
+
   return (
     <Container className="py-16 md:py-16">
       <SectionHeading
-        eyebrow="Browse"
-        title="Top Category"
-        description="Browse gear by type — find exactly what you're looking for in seconds."
-        action={{ label: "View all", href: "/categories" }}
+        eyebrow={t("home.categoriesEyebrow")}
+        title={t("home.categoriesTitle")}
+        description={t("home.categoriesDesc")}
+        action={{ label: t("common.viewAll"), href: "/categories" }}
       />
 
       {/* Icon row: horizontal scroll on mobile, wraps + centers from sm up */}
@@ -59,7 +62,7 @@ export function Categories() {
                     <Icon className="h-6 w-6 text-muted-foreground transition-colors group-hover:text-primary" />
                   </span>
                   <span className="text-xs font-medium text-muted-foreground text-center transition-colors group-hover:text-foreground">
-                    {category.name}
+                    {t(category.nameKey)}
                   </span>
                 </Link>
               </motion.div>

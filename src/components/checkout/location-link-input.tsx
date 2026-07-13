@@ -9,6 +9,7 @@ import {
   isGoogleMapsUrl,
   isGoogleMapsShortLink,
 } from "@/lib/google-maps-link";
+import { useLanguage } from "@/providers/language-provider";
 
 interface LocationLinkInputProps {
   value: { lat: number; lng: number } | null;
@@ -16,6 +17,7 @@ interface LocationLinkInputProps {
 }
 
 export function LocationLinkInput({ value, onChange }: LocationLinkInputProps) {
+  const { t } = useLanguage();
   const [link, setLink] = useState("");
   const [status, setStatus] = useState<"idle" | "loading" | "error">("idle");
   const [error, setError] = useState<string | null>(null);
@@ -26,9 +28,7 @@ export function LocationLinkInput({ value, onChange }: LocationLinkInputProps) {
 
     if (!isGoogleMapsUrl(trimmed)) {
       setStatus("error");
-      setError(
-        "That doesn't look like a Google Maps link. Open Google Maps, tap Share, and paste the link here."
-      );
+      setError(t("checkout.locationInvalidLink"));
       return;
     }
 
@@ -54,14 +54,14 @@ export function LocationLinkInput({ value, onChange }: LocationLinkInputProps) {
       const data = await res.json();
 
       if (!res.ok || typeof data.lat !== "number") {
-        throw new Error(data.error || "Couldn't read that link.");
+        throw new Error(data.error || t("checkout.locationCouldntRead"));
       }
 
       onChange({ lat: data.lat, lng: data.lng });
       setStatus("idle");
     } catch (err) {
       setStatus("error");
-      setError(err instanceof Error ? err.message : "Couldn't read that link.");
+      setError(err instanceof Error ? err.message : t("checkout.locationCouldntRead"));
     }
   };
 
@@ -69,7 +69,7 @@ export function LocationLinkInput({ value, onChange }: LocationLinkInputProps) {
     return (
       <div className="flex flex-col gap-2 rounded-xl border border-emerald-500/30 bg-emerald-500/5 px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-center gap-2 text-sm text-emerald-500 font-medium">
-          <CheckCircle2 className="h-4 w-4 shrink-0" /> Location captured
+          <CheckCircle2 className="h-4 w-4 shrink-0" /> {t("checkout.locationCaptured")}
         </div>
         <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
           <a
@@ -78,7 +78,7 @@ export function LocationLinkInput({ value, onChange }: LocationLinkInputProps) {
             rel="noopener noreferrer"
             className="text-xs font-medium text-primary underline underline-offset-2"
           >
-            View on map
+            {t("checkout.viewOnMap")}
           </a>
           <button
             type="button"
@@ -90,7 +90,7 @@ export function LocationLinkInput({ value, onChange }: LocationLinkInputProps) {
             }}
             className="text-xs text-muted-foreground hover:text-foreground"
           >
-            Change
+            {t("checkout.changeLocation")}
           </button>
         </div>
       </div>
@@ -110,7 +110,7 @@ export function LocationLinkInput({ value, onChange }: LocationLinkInputProps) {
               setLink(e.target.value);
               if (status === "error") setStatus("idle");
             }}
-            placeholder="Paste Google Maps share link…"
+            placeholder={t("checkout.pasteLocationPlaceholder")}
             className="pl-10"
           />
         </div>
@@ -122,10 +122,10 @@ export function LocationLinkInput({ value, onChange }: LocationLinkInputProps) {
         >
           {status === "loading" ? (
             <>
-              <LoaderCircle className="h-4 w-4 animate-spin" /> Reading…
+              <LoaderCircle className="h-4 w-4 animate-spin" /> {t("checkout.readingLink")}
             </>
           ) : (
-            "Use This Link"
+            t("checkout.useThisLink")
           )}
         </Button>
       </div>
@@ -138,8 +138,7 @@ export function LocationLinkInput({ value, onChange }: LocationLinkInputProps) {
       )}
 
       <p className="text-xs text-muted-foreground">
-        Open Google Maps → tap your location → Share → Copy link, then paste
-        it above.
+        {t("checkout.locationHelpText")}
       </p>
     </div>
   );

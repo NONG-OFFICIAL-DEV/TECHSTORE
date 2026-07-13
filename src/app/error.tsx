@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import Link from "next/link";
 import { AlertTriangle } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useLanguage } from "@/providers/language-provider";
 
 export default function Error({
   error,
@@ -12,6 +13,8 @@ export default function Error({
   error: Error & { digest?: string };
   unstable_retry: () => void;
 }) {
+  const { t } = useLanguage();
+
   useEffect(() => {
     console.error(error);
   }, [error]);
@@ -21,14 +24,14 @@ export default function Error({
       <div className="flex h-16 w-16 items-center justify-center rounded-full bg-destructive/10 border border-destructive/30 mb-5">
         <AlertTriangle className="h-7 w-7 text-destructive" strokeWidth={1.5} />
       </div>
-      <h1 className="text-2xl font-bold text-foreground">Something went wrong</h1>
+      <h1 className="text-2xl font-bold text-foreground">{t("errorPage.title")}</h1>
       <p className="mt-2 text-muted-foreground max-w-sm">
-        An unexpected error occurred. Please try again, or head back home.
+        {t("errorPage.description")}
       </p>
       <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
-        <Button onClick={() => unstable_retry()}>Try again</Button>
+        <Button onClick={() => unstable_retry()}>{t("errorPage.tryAgain")}</Button>
         <Button variant="outline" asChild>
-          <Link href="/">Back to Home</Link>
+          <Link href="/">{t("errorPage.backHome")}</Link>
         </Button>
       </div>
     </div>

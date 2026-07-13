@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { useCart } from "@/hooks/use-cart";
 import { useWishlist } from "@/hooks/use-wishlist";
 import { useHasMounted } from "@/hooks/use-has-mounted";
+import { useLanguage } from "@/providers/language-provider";
 import { cn, formatPrice } from "@/lib/utils";
 
 interface ProductCardProps {
@@ -18,6 +19,7 @@ interface ProductCardProps {
 }
 
 export function ProductCard({ product, index = 0 }: ProductCardProps) {
+  const { t } = useLanguage();
   const addItem = useCart((state) => state.addItem);
   const wishlisted = useWishlist((state) => state.isWishlisted(product.id));
   const toggleWishlist = useWishlist((state) => state.toggleItem);
@@ -73,7 +75,7 @@ export function ProductCard({ product, index = 0 }: ProductCardProps) {
           <div className="absolute top-3 left-3 flex flex-col gap-1.5">
             {product.isNew && (
               <Badge className="bg-primary text-primary-foreground border-0">
-                New
+                {t("products.newBadge")}
               </Badge>
             )}
             {product.discountPercent && (
@@ -87,9 +89,9 @@ export function ProductCard({ product, index = 0 }: ProductCardProps) {
           <button
             type="button"
             onClick={handleToggleWishlist}
-            aria-label={
-              isWishlisted ? `Remove ${product.name} from wishlist` : `Add ${product.name} to wishlist`
-            }
+            aria-label={t(
+              isWishlisted ? "productDetail.removeFromWishlist" : "productDetail.addToWishlist"
+            )}
             aria-pressed={isWishlisted}
             className="absolute top-3 right-3 flex h-8 w-8 items-center justify-center rounded-full bg-background/70 backdrop-blur-sm border border-border/60 transition-colors hover:border-primary/40 cursor-pointer"
           >
@@ -113,7 +115,7 @@ export function ProductCard({ product, index = 0 }: ProductCardProps) {
             <Button
               size="icon"
               onClick={handleAddToCart}
-              aria-label={`Add ${product.name} to cart`}
+              aria-label={t("common.addToCart")}
               className="h-11 w-11 md:h-10 md:w-10 rounded-full shadow-lg cursor-pointer"
             >
               <ShoppingCart className="h-4 w-4" />

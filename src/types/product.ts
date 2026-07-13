@@ -28,6 +28,7 @@ export interface Category {
   id: string;
   slug: string;
   name: string;
+  nameKey: string;
   description: string;
   icon: string;
   productCount: number;
