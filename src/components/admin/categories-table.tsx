@@ -4,7 +4,7 @@ import Link from "next/link";
 import { ColumnDef } from "@tanstack/react-table";
 import { DataTable } from "@/components/ui/data-table";
 import { AdminThumbnail } from "@/components/admin/admin-thumbnail";
-import { DeleteCategoryButton } from "@/components/admin/delete-category-button";
+import { DeleteConfirmButton } from "@/components/admin/delete-confirm-button";
 import type { Category } from "@/types/product";
 
 const columns: ColumnDef<Category>[] = [
@@ -46,7 +46,18 @@ const columns: ColumnDef<Category>[] = [
           >
             Edit
           </Link>
-          <DeleteCategoryButton categoryId={category.id} categoryName={category.name} />
+          <DeleteConfirmButton
+            itemName={category.name}
+            itemLabel="category"
+            onDelete={async () => {
+              const response = await fetch(`/api/admin/categories/${category.id}`, {
+                method: "DELETE",
+              });
+              if (response.ok) return { ok: true };
+              const data = await response.json().catch(() => null);
+              return { ok: false, error: data?.error };
+            }}
+          />
         </div>
       );
     },

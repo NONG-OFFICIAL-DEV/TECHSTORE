@@ -4,7 +4,7 @@ import Link from "next/link";
 import { ColumnDef } from "@tanstack/react-table";
 import { DataTable } from "@/components/ui/data-table";
 import { AdminThumbnail } from "@/components/admin/admin-thumbnail";
-import { DeleteProductButton } from "@/components/admin/delete-product-button";
+import { DeleteConfirmButton } from "@/components/admin/delete-confirm-button";
 import { formatPrice } from "@/lib/utils";
 import type { AdminProduct } from "@/lib/serializers";
 
@@ -66,7 +66,18 @@ const columns: ColumnDef<AdminProduct>[] = [
           >
             Edit
           </Link>
-          <DeleteProductButton productId={product.id} productName={product.name} />
+          <DeleteConfirmButton
+            itemName={product.name}
+            itemLabel="product"
+            onDelete={async () => {
+              const response = await fetch(`/api/admin/products/${product.id}`, {
+                method: "DELETE",
+              });
+              if (response.ok) return { ok: true };
+              const data = await response.json().catch(() => null);
+              return { ok: false, error: data?.error };
+            }}
+          />
         </div>
       );
     },
