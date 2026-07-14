@@ -1,0 +1,172 @@
+// Prisma 7 generates a standalone TS client (no bundled Rust query engine)
+// into `generated/prisma` instead of node_modules/@prisma/client. The
+// datasource has no `url`/`directUrl` here anymore — see prisma.config.ts
+// (used by the CLI for migrations) and src/lib/prisma.ts (used at runtime,
+// via a driver adapter) for where the two connection strings now live.
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ---------------------------------------------------------------------------
+// Catalog
+// ---------------------------------------------------------------------------
+
+model Category {
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  name        String
+  // i18n dictionary key used by the storefront (e.g. "categories.audio"),
+  // kept alongside `name` so the admin can edit copy without touching code.
+  nameKey     String
+  description String
+  icon        String
+  image       String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  products Product[]
+
+  @@map("categories")
+}
+
+model Product {
+  id               String   @id @default(cuid())
+  slug             String   @unique
+  name             String
+  brand            String
+  categoryId       String
+  category         Category @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+
+  price            Decimal  @db.Decimal(10, 2)
+  compareAtPrice   Decimal? @db.Decimal(10, 2)
+  currency         String   @default("USD")
+
+  rating           Float    @default(0)
+  reviewCount      Int      @default(0)
+
+  images           String[]
+  thumbnail        String
+  description      String   @db.Text
+  shortDescription String
+  // Record<string, string> spec sheet (e.g. { "Battery Life": "40 hours" }).
+  specs            Json
+  features         String[]
+  // { name: string; hex: string }[] — optional color variants.
+  colors           Json?
+
+  inStock          Boolean  @default(true)
+  stockCount       Int?
+  isNew            Boolean  @default(false)
+  isFeatured       Boolean  @default(false)
+  discountPercent  Int?
+  tags             String[]
+
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  orderItems OrderItem[]
+
+  @@index([categoryId])
+  @@map("products")
+}
+
+// ---------------------------------------------------------------------------
+// Orders
+// ---------------------------------------------------------------------------
+
+enum OrderStatus {
+  PENDING_PAYMENT
+  PAID
+  PROCESSING
+  SHIPPED
+  DELIVERED
+  CANCELLED
+  REFUNDED
+}
+
+enum DeliveryRegion {
+  PHNOM_PENH
+  PROVINCE
+}
+
+model Order {
+  id          String      @id @default(cuid())
+  orderNumber String      @unique
+  status      OrderStatus @default(PENDING_PAYMENT)
+
+  customerFullName String
+  customerPhone    String
+  customerEmail    String?
+
+  deliveryRegion   DeliveryRegion
+  deliveryAddress  String
+  deliveryProvince String?
+  deliveryDistrict String?
+  deliveryLat      Float?
+  deliveryLng      Float?
+
+  shippingMethod String
+  shippingCost   Decimal @db.Decimal(10, 2)
+
+  paymentMethod String
+  subtotal      Decimal @db.Decimal(10, 2)
+  total         Decimal @db.Decimal(10, 2)
+  currency      String  @default("USD")
+
+  // Stripe linkage — nullable because local payment methods (KHQR/ABA
+  // transfer) never go through Stripe. Unique so the webhook can upsert
+  // idempotently on repeated delivery of the same event.
+  stripeSessionId       String? @unique
+  stripePaymentIntentId String?
+  paidAt                DateTime?
+
+  items OrderItem[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("orders")
+}
+
+model OrderItem {
+  id      String  @id @default(cuid())
+  orderId String
+  order   Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  // Kept nullable + onDelete: SetNull — an order line must survive the
+  // referenced product being deleted from the catalog later.
+  productId String?
+  product   Product? @relation(fields: [productId], references: [id], onDelete: SetNull)
+
+  // Snapshot fields: the order should freeze the name/price at purchase
+  // time, independent of later catalog edits.
+  name          String
+  price         Decimal @db.Decimal(10, 2)
+  quantity      Int
+  selectedColor String?
+
+  @@map("order_items")
+}
+
+// ---------------------------------------------------------------------------
+// Admin auth
+// ---------------------------------------------------------------------------
+
+// Deliberately shaped like a standard credentials-auth user table (email +
+// password hash) so this can be handed to NextAuth's Credentials provider or
+// Clerk's external-user import later without a schema migration.
+model AdminUser {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String
+  name         String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@map("admin_users")
+}

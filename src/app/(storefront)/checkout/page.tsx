@@ -233,7 +233,7 @@ export default function CheckoutPage() {
           shipping: { method: selectedShipping.name, cost: selectedShipping.cost },
           paymentMethod,
           items: items.map((item) => ({
-            productId: item.product.id,
+            productSlug: item.product.slug,
             name: item.product.name,
             price: item.product.price,
             quantity: item.quantity,

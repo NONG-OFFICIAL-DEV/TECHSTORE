@@ -1,10 +1,7 @@
-import { MobileNav } from "@/components/layout/mobile-nav";
 import type { Metadata, Viewport } from "next";
 import { Space_Grotesk, Poppins, JetBrains_Mono, Noto_Sans_Khmer } from "next/font/google";
 import { ThemeProvider } from "@/providers/theme-provider";
 import { LanguageProvider } from "@/providers/language-provider";
-import { Navbar } from "@/components/layout/navbar";
-import { Footer } from "@/components/layout/footer";
 import "./globals.css";
 
 const spaceGrotesk = Space_Grotesk({
@@ -61,12 +58,7 @@ export default function RootLayout({
     >
       <body className="min-h-full flex flex-col bg-background text-foreground">
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false} disableTransitionOnChange>
-          <LanguageProvider>
-            <Navbar />
-            <main className="flex-1">{children}</main>
-            <Footer />
-            <MobileNav />
-          </LanguageProvider>
+          <LanguageProvider>{children}</LanguageProvider>
         </ThemeProvider>
       </body>
     </html>

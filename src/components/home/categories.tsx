@@ -3,11 +3,11 @@
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { Headphones, Watch, Laptop, Home as HomeIcon, type LucideIcon } from "lucide-react";
-import { categories } from "@/data/products";
 import { Container } from "@/components/shared/container";
 import { cn } from "@/lib/utils";
 import { SectionHeading } from "@/components/shared/section-heading";
 import { useLanguage } from "@/providers/language-provider";
+import type { Category } from "@/types/product";
 
 const ICON_MAP: Record<string, LucideIcon> = {
   Headphones,
@@ -16,7 +16,7 @@ const ICON_MAP: Record<string, LucideIcon> = {
   Home: HomeIcon,
 };
 
-export function Categories() {
+export function Categories({ categories }: { categories: Category[] }) {
   const { t } = useLanguage();
 
   return (

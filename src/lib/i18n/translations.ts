@@ -64,6 +64,14 @@ const en = {
     smartHome: "Smart Home",
     power: "Power",
   },
+  categoriesPage: {
+    breadcrumb: "Categories",
+    title: "Shop by Category",
+    description: "Browse the full catalog by type — find exactly what you're looking for in seconds.",
+    productCountOne: "{count} product",
+    productCountOther: "{count} products",
+    viewProducts: "View products",
+  },
   products: {
     newBadge: "New",
     title: "All Products",
@@ -284,6 +292,14 @@ const km: typeof en = {
     computing: "កុំព្យូទ័រ",
     smartHome: "ផ្ទះឆ្លាតវៃ",
     power: "ថាមពល",
+  },
+  categoriesPage: {
+    breadcrumb: "ប្រភេទទំនិញ",
+    title: "ទិញតាមប្រភេទ",
+    description: "រកមើលទំនិញទាំងអស់តាមប្រភេទ — ស្វែងរកអ្វីដែលអ្នកកំពុងស្វែងរកក្នុងរយៈពេលប៉ុន្មានវិនាទី។",
+    productCountOne: "ផលិតផលចំនួន {count}",
+    productCountOther: "ផលិតផលចំនួន {count}",
+    viewProducts: "មើលផលិតផល",
   },
   products: {
     newBadge: "ថ្មី",

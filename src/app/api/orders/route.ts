@@ -1,44 +1,74 @@
 import { NextRequest, NextResponse } from "next/server";
-import { appendJsonRecord } from "@/lib/json-store";
-import type { Order } from "@/types/order";
-
-const ORDERS_FILE = "orders.json";
+import { prisma, DeliveryRegion } from "@/lib/prisma";
 
 function generateOrderNumber() {
   const random = Math.random().toString(36).slice(2, 7).toUpperCase();
   return `NV-${random}`;
 }
 
-export async function POST(request: NextRequest) {
-  const body = await request.json();
+interface OrderItemInput {
+  productSlug?: string;
+  name: string;
+  price: number;
+  quantity: number;
+  selectedColor?: string;
+}
 
-  if (
-    !body?.customer?.fullName?.trim() ||
-    !body?.customer?.phone?.trim() ||
-    !Array.isArray(body?.items) ||
-    body.items.length === 0
-  ) {
+export async function POST(request: NextRequest) {
+  const body = await request.json().catch(() => null);
+
+  const fullName: string | undefined = body?.customer?.fullName?.trim();
+  const phone: string | undefined = body?.customer?.phone?.trim();
+  const items: OrderItemInput[] | undefined = body?.items;
+
+  if (!fullName || !phone || !Array.isArray(items) || items.length === 0) {
     return NextResponse.json(
       { error: "Missing required order fields." },
       { status: 400 }
     );
   }
 
-  const order: Order = {
-    id: crypto.randomUUID(),
-    orderNumber: generateOrderNumber(),
-    createdAt: new Date().toISOString(),
-    status: "pending_payment",
-    customer: body.customer,
-    delivery: body.delivery,
-    shipping: body.shipping,
-    paymentMethod: body.paymentMethod,
-    items: body.items,
-    subtotal: body.subtotal,
-    total: body.total,
-  };
+  // The cart's product ids come from the static storefront catalog, which
+  // don't match real Product rows in the DB — resolve real ids via slug so
+  // OrderItem.productId links to an actual product wherever possible.
+  const slugs = items
+    .map((item) => item.productSlug)
+    .filter((slug): slug is string => Boolean(slug));
+  const products = slugs.length
+    ? await prisma.product.findMany({ where: { slug: { in: slugs } } })
+    : [];
+  const productIdBySlug = new Map(products.map((p) => [p.slug, p.id]));
 
-  await appendJsonRecord<Order>(ORDERS_FILE, order);
+  const region: DeliveryRegion =
+    body.delivery?.region === "province" ? "PROVINCE" : "PHNOM_PENH";
+
+  const order = await prisma.order.create({
+    data: {
+      orderNumber: generateOrderNumber(),
+      customerFullName: fullName,
+      customerPhone: phone,
+      deliveryRegion: region,
+      deliveryAddress: body.delivery?.address ?? "",
+      deliveryProvince: body.delivery?.province ?? null,
+      deliveryDistrict: body.delivery?.district ?? null,
+      deliveryLat: body.delivery?.coords?.lat ?? null,
+      deliveryLng: body.delivery?.coords?.lng ?? null,
+      shippingMethod: body.shipping?.method ?? "",
+      shippingCost: body.shipping?.cost ?? 0,
+      paymentMethod: body.paymentMethod ?? "",
+      subtotal: body.subtotal ?? 0,
+      total: body.total ?? 0,
+      items: {
+        create: items.map((item) => ({
+          productId: item.productSlug ? productIdBySlug.get(item.productSlug) ?? null : null,
+          name: item.name,
+          price: item.price,
+          quantity: item.quantity,
+          selectedColor: item.selectedColor,
+        })),
+      },
+    },
+  });
 
   return NextResponse.json({ orderNumber: order.orderNumber, id: order.id });
 }

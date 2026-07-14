@@ -2,8 +2,8 @@
 
 import { useState, useMemo } from "react";
 import { useSearchParams } from "next/navigation";
-import { products, categories } from "@/data/products";
-import { SortOption } from "@/types/product";
+import { products } from "@/data/products";
+import { Category, SortOption } from "@/types/product";
 import { ProductGrid } from "@/components/product/product-grid";
 import { SearchBar } from "@/components/product/search-bar";
 import { CategoryFilter } from "@/components/product/category-filter";
@@ -15,7 +15,7 @@ import { useLanguage } from "@/providers/language-provider";
 
 const PAGE_SIZE = 8;
 
-export default function ProductsPage() {
+export function ProductsContent({ categories }: { categories: Category[] }) {
   const { t } = useLanguage();
   const searchParams = useSearchParams();
   const initialCategory = searchParams.get("category") ?? undefined;

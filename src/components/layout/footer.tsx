@@ -3,9 +3,10 @@
 import { useState } from "react";
 import Link from "next/link";
 import { Loader2, Check } from "lucide-react";
-import { NAV_LINKS, CATEGORIES } from "@/data/nav";
+import { NAV_LINKS } from "@/data/nav";
 import { Button } from "@/components/ui/button";
 import { useLanguage } from "@/providers/language-provider";
+import type { Category } from "@/types/product";
 
 const SOCIALS = [
   { label: "GH", name: "GitHub", href: "#" },
@@ -15,7 +16,7 @@ const SOCIALS = [
 
 type NewsletterStatus = "idle" | "submitting" | "success" | "error";
 
-export function Footer() {
+export function Footer({ categories }: { categories: Category[] }) {
   const { t } = useLanguage();
   const [email, setEmail] = useState("");
   const [status, setStatus] = useState<NewsletterStatus>("idle");
@@ -100,7 +101,7 @@ export function Footer() {
           <div>
             <h3 className="text-sm font-semibold">{t("footer.categories")}</h3>
             <ul className="mt-4 space-y-3">
-              {CATEGORIES.map((c) => (
+              {categories.map((c) => (
                 <li key={c.id}>
                   <Link
                     href={`/products?category=${c.slug}`}

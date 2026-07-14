@@ -1,23 +1,40 @@
 import Link from "next/link";
-import { Headphones, Watch, Keyboard, BatteryCharging, ChevronRight, type LucideIcon } from "lucide-react";
-import { CATEGORIES } from "@/data/nav";
+import {
+  Headphones,
+  Watch,
+  Laptop,
+  Home,
+  Keyboard,
+  BatteryCharging,
+  ChevronRight,
+  type LucideIcon,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
+import type { Category } from "@/types/product";
 
 const ICONS: Record<string, LucideIcon> = {
   Headphones,
   Watch,
+  Laptop,
+  Home,
   Keyboard,
   BatteryCharging,
 };
 
-export function CategorySidebar({ className }: { className?: string }) {
+export function CategorySidebar({
+  categories,
+  className,
+}: {
+  categories: Category[];
+  className?: string;
+}) {
   return (
     <nav
       aria-label="Shop by category"
       className={cn("rounded-xl border border-border bg-card overflow-hidden", className)}
     >
       <ul className="divide-y divide-border">
-        {CATEGORIES.map((category) => {
+        {categories.map((category) => {
           const Icon = ICONS[category.icon];
           return (
             <li key={category.id}>
