@@ -38,10 +38,26 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
     return NextResponse.json({ error: "Invalid status." }, { status: 400 });
   }
 
+  // Tracking fields are only touched when the caller actually sends them —
+  // OrderStatusSelect PATCHes with just {status}, and must not wipe out
+  // tracking info that was set separately via the tracking form.
+  const data: { status: OrderStatus; trackingNumber?: string | null; carrier?: string | null; shippedAt?: Date | null } = {
+    status: status as OrderStatus,
+  };
+  if ("trackingNumber" in body) {
+    data.trackingNumber = typeof body.trackingNumber === "string" ? body.trackingNumber.trim() || null : null;
+  }
+  if ("carrier" in body) {
+    data.carrier = typeof body.carrier === "string" ? body.carrier.trim() || null : null;
+  }
+  if ("shippedAt" in body) {
+    data.shippedAt = body.shippedAt ? new Date(body.shippedAt) : null;
+  }
+
   try {
     const order = await prisma.order.update({
       where: { id },
-      data: { status: status as OrderStatus },
+      data,
       include: { items: true },
     });
     return NextResponse.json(toAdminOrderDTO(order));

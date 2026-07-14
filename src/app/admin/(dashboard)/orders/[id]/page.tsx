@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { toAdminOrderDTO } from "@/lib/serializers";
 import { formatPrice } from "@/lib/utils";
 import { OrderStatusSelect } from "@/components/admin/order-status-select";
+import { OrderTrackingForm } from "@/components/admin/order-tracking-form";
 import { AutoRefresh } from "@/components/admin/auto-refresh";
 import {
   Breadcrumb,
@@ -88,6 +89,12 @@ export default async function AdminOrderDetailPage({ params }: OrderDetailPagePr
                 <span>Shipping ({dto.shipping.method})</span>
                 <span className="text-foreground">{formatPrice(dto.shipping.cost)}</span>
               </div>
+              {dto.couponCode && (
+                <div className="flex justify-between text-muted-foreground">
+                  <span>Discount ({dto.couponCode})</span>
+                  <span className="text-emerald-500">-{formatPrice(dto.discountAmount)}</span>
+                </div>
+              )}
               <div className="flex justify-between text-base font-semibold">
                 <span>Total</span>
                 <span className="text-primary">{formatPrice(dto.total)}</span>
@@ -146,6 +153,19 @@ export default async function AdminOrderDetailPage({ params }: OrderDetailPagePr
               Status
             </h2>
             <OrderStatusSelect orderId={dto.id} status={dto.status} />
+          </section>
+
+          <section className="rounded-2xl border border-border bg-card p-6 shadow-sm">
+            <h2 className="mb-4 text-sm font-semibold uppercase tracking-wider text-muted-foreground">
+              Shipping
+            </h2>
+            <OrderTrackingForm
+              orderId={dto.id}
+              status={dto.status}
+              trackingNumber={dto.trackingNumber}
+              carrier={dto.carrier}
+              shippedAt={dto.shippedAt}
+            />
           </section>
 
           <section className="rounded-2xl border border-border bg-card p-6 shadow-sm">

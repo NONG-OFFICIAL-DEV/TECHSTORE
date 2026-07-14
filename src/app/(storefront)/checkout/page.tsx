@@ -14,6 +14,8 @@ import {
   CheckCircle2,
   Check,
   AlertCircle,
+  Tag,
+  X,
 } from "lucide-react";
 import { useCart } from "@/hooks/use-cart";
 import { Button } from "@/components/ui/button";
@@ -165,6 +167,12 @@ export default function CheckoutPage() {
   const [selectedShipping, setSelectedShipping] = useState(SHIPPING_METHODS[LOCATION_PHNOM_PENH][0]);
   const [paymentMethod, setPaymentMethod] = useState("khqr");
 
+  // Coupon
+  const [couponInput, setCouponInput] = useState("");
+  const [appliedCoupon, setAppliedCoupon] = useState<{ code: string; discountAmount: number } | null>(null);
+  const [isApplyingCoupon, setIsApplyingCoupon] = useState(false);
+  const [couponError, setCouponError] = useState<string | null>(null);
+
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isOrdered, setIsOrdered] = useState(false);
   const [orderNumber, setOrderNumber] = useState<string | null>(null);
@@ -184,7 +192,36 @@ export default function CheckoutPage() {
     setStepError(null);
   };
 
-  const total = subtotal + selectedShipping.cost;
+  const total = subtotal + selectedShipping.cost - (appliedCoupon?.discountAmount ?? 0);
+
+  const handleApplyCoupon = async () => {
+    if (!couponInput.trim()) return;
+    setIsApplyingCoupon(true);
+    setCouponError(null);
+    try {
+      const response = await fetch("/api/coupons/validate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ code: couponInput.trim(), subtotal }),
+      });
+      const data = await response.json();
+      if (!response.ok || !data.valid) {
+        setCouponError(t("checkout.couponInvalid"));
+        return;
+      }
+      setAppliedCoupon({ code: data.code, discountAmount: data.discountAmount });
+      setCouponInput("");
+    } catch {
+      setCouponError(t("checkout.couponInvalid"));
+    } finally {
+      setIsApplyingCoupon(false);
+    }
+  };
+
+  const handleRemoveCoupon = () => {
+    setAppliedCoupon(null);
+    setCouponError(null);
+  };
 
   const goToStep = (next: number) => {
     setDirection(next > step ? 1 : -1);
@@ -232,6 +269,7 @@ export default function CheckoutPage() {
           },
           shipping: { method: selectedShipping.name, cost: selectedShipping.cost },
           paymentMethod,
+          couponCode: appliedCoupon?.code,
           items: items.map((item) => ({
             productSlug: item.product.slug,
             name: item.product.name,
@@ -697,6 +735,60 @@ export default function CheckoutPage() {
                 <span className="truncate">{t("checkout.deliveryVia", { name: selectedShipping.name })}</span>
                 <span className="text-foreground font-medium shrink-0">{formatPrice(selectedShipping.cost)}</span>
               </div>
+              {appliedCoupon && (
+                <div className="flex justify-between gap-2 text-muted-foreground">
+                  <span className="truncate">{t("checkout.discount")}</span>
+                  <span className="text-emerald-500 font-medium shrink-0">
+                    -{formatPrice(appliedCoupon.discountAmount)}
+                  </span>
+                </div>
+              )}
+            </div>
+
+            <Separator className="my-4" />
+
+            <div>
+              <label className="text-xs font-medium text-muted-foreground">
+                {t("checkout.couponLabel")}
+              </label>
+              {appliedCoupon ? (
+                <div className="mt-1.5 flex items-center justify-between gap-2 rounded-xl border border-primary/30 bg-primary/5 px-3 py-2">
+                  <span className="flex items-center gap-1.5 text-sm font-medium text-primary truncate">
+                    <Tag className="h-3.5 w-3.5 shrink-0" />
+                    {t("checkout.couponApplied", { code: appliedCoupon.code })}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={handleRemoveCoupon}
+                    aria-label={t("checkout.couponRemove")}
+                    className="shrink-0 text-muted-foreground hover:text-foreground"
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
+                </div>
+              ) : (
+                <div className="mt-1.5 flex gap-2">
+                  <input
+                    value={couponInput}
+                    onChange={(e) => {
+                      setCouponInput(e.target.value);
+                      setCouponError(null);
+                    }}
+                    type="text"
+                    placeholder={t("checkout.couponPlaceholder")}
+                    className="min-w-0 flex-1 rounded-xl border border-border bg-background px-3 py-2 text-base sm:text-sm uppercase focus:outline-none focus:ring-2 focus:ring-primary/20"
+                  />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={handleApplyCoupon}
+                    disabled={isApplyingCoupon || !couponInput.trim()}
+                  >
+                    {isApplyingCoupon ? t("checkout.couponApplying") : t("checkout.couponApply")}
+                  </Button>
+                </div>
+              )}
+              {couponError && <p className="mt-1.5 text-xs text-destructive">{couponError}</p>}
             </div>
 
             <Separator className="my-4" />

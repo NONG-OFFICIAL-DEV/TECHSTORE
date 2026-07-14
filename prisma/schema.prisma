@@ -125,6 +125,16 @@ model Order {
   stripePaymentIntentId String?
   paidAt                DateTime?
 
+  // Snapshot fields, same philosophy as OrderItem — freeze what coupon was
+  // applied and how much it took off, independent of the Coupon row later
+  // changing or being deleted.
+  couponCode     String?
+  discountAmount Decimal @db.Decimal(10, 2) @default(0)
+
+  trackingNumber String?
+  carrier        String?
+  shippedAt      DateTime?
+
   items OrderItem[]
 
   createdAt DateTime @default(now())
@@ -151,6 +161,32 @@ model OrderItem {
   selectedColor String?
 
   @@map("order_items")
+}
+
+// ---------------------------------------------------------------------------
+// Coupons
+// ---------------------------------------------------------------------------
+
+enum CouponType {
+  PERCENT
+  FIXED
+}
+
+model Coupon {
+  id             String     @id @default(cuid())
+  code           String     @unique
+  type           CouponType
+  value          Decimal    @db.Decimal(10, 2)
+  active         Boolean    @default(true)
+  expiresAt      DateTime?
+  minSubtotal    Decimal?   @db.Decimal(10, 2)
+  maxRedemptions Int?
+  timesRedeemed  Int        @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("coupons")
 }
 
 // ---------------------------------------------------------------------------

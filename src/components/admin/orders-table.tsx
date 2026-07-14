@@ -9,13 +9,17 @@ import { OrderStatusSelect } from "@/components/admin/order-status-select";
 import { formatPrice } from "@/lib/utils";
 import type { Order } from "@/lib/prisma";
 
-// Prisma's Decimal fields (shippingCost, subtotal, total) can't cross the
-// Server -> Client Component boundary as-is, so the page maps rows to this
-// shape (plain numbers) before handing them to this (client) table.
-export type OrderListRow = Omit<Order, "shippingCost" | "subtotal" | "total"> & {
+// Prisma's Decimal fields can't cross the Server -> Client Component
+// boundary as-is, so the page maps rows to this shape (plain numbers)
+// before handing them to this (client) table.
+export type OrderListRow = Omit<
+  Order,
+  "shippingCost" | "subtotal" | "total" | "discountAmount"
+> & {
   shippingCost: number;
   subtotal: number;
   total: number;
+  discountAmount: number;
 };
 
 const columns: ColumnDef<OrderListRow>[] = [

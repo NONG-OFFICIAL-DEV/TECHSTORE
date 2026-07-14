@@ -3,6 +3,7 @@ import type {
   Product as ProductModel,
   Order as OrderModel,
   OrderItem as OrderItemModel,
+  Coupon as CouponModel,
 } from "../../generated/prisma/client";
 import type { Category, Product } from "@/types/product";
 
@@ -82,6 +83,11 @@ export interface AdminOrder {
   subtotal: number;
   total: number;
   currency: string;
+  couponCode: string | null;
+  discountAmount: number;
+  trackingNumber: string | null;
+  carrier: string | null;
+  shippedAt: string | null;
   stripeSessionId: string | null;
   stripePaymentIntentId: string | null;
   paidAt: string | null;
@@ -119,6 +125,11 @@ export function toAdminOrderDTO(order: OrderWithItems): AdminOrder {
     subtotal: toNumber(order.subtotal),
     total: toNumber(order.total),
     currency: order.currency,
+    couponCode: order.couponCode,
+    discountAmount: toNumber(order.discountAmount),
+    trackingNumber: order.trackingNumber,
+    carrier: order.carrier,
+    shippedAt: order.shippedAt ? order.shippedAt.toISOString() : null,
     stripeSessionId: order.stripeSessionId,
     stripePaymentIntentId: order.stripePaymentIntentId,
     paidAt: order.paidAt ? order.paidAt.toISOString() : null,
@@ -131,6 +142,34 @@ export function toAdminOrderDTO(order: OrderWithItems): AdminOrder {
       quantity: item.quantity,
       selectedColor: item.selectedColor,
     })),
+  };
+}
+
+export interface CouponDTO {
+  id: string;
+  code: string;
+  type: CouponModel["type"];
+  value: number;
+  active: boolean;
+  expiresAt: string | null;
+  minSubtotal: number | null;
+  maxRedemptions: number | null;
+  timesRedeemed: number;
+  createdAt: string;
+}
+
+export function toCouponDTO(coupon: CouponModel): CouponDTO {
+  return {
+    id: coupon.id,
+    code: coupon.code,
+    type: coupon.type,
+    value: toNumber(coupon.value),
+    active: coupon.active,
+    expiresAt: coupon.expiresAt ? coupon.expiresAt.toISOString() : null,
+    minSubtotal: coupon.minSubtotal != null ? toNumber(coupon.minSubtotal) : null,
+    maxRedemptions: coupon.maxRedemptions,
+    timesRedeemed: coupon.timesRedeemed,
+    createdAt: coupon.createdAt.toISOString(),
   };
 }
 

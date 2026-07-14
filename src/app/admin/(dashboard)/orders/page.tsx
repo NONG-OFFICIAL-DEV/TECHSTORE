@@ -16,6 +16,7 @@ export default async function AdminOrdersPage() {
     shippingCost: Number(order.shippingCost),
     subtotal: Number(order.subtotal),
     total: Number(order.total),
+    discountAmount: Number(order.discountAmount),
   }));
 
   return (

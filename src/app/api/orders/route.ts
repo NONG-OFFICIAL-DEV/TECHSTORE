@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma, DeliveryRegion } from "@/lib/prisma";
+import { computeCouponDiscount, getCouponRedemptionError } from "@/lib/validation/coupon";
 
 function generateOrderNumber() {
   const random = Math.random().toString(36).slice(2, 7).toUpperCase();
@@ -42,32 +43,66 @@ export async function POST(request: NextRequest) {
   const region: DeliveryRegion =
     body.delivery?.region === "province" ? "PROVINCE" : "PHNOM_PENH";
 
-  const order = await prisma.order.create({
-    data: {
-      orderNumber: generateOrderNumber(),
-      customerFullName: fullName,
-      customerPhone: phone,
-      deliveryRegion: region,
-      deliveryAddress: body.delivery?.address ?? "",
-      deliveryProvince: body.delivery?.province ?? null,
-      deliveryDistrict: body.delivery?.district ?? null,
-      deliveryLat: body.delivery?.coords?.lat ?? null,
-      deliveryLng: body.delivery?.coords?.lng ?? null,
-      shippingMethod: body.shipping?.method ?? "",
-      shippingCost: body.shipping?.cost ?? 0,
-      paymentMethod: body.paymentMethod ?? "",
-      subtotal: body.subtotal ?? 0,
-      total: body.total ?? 0,
-      items: {
-        create: items.map((item) => ({
-          productId: item.productSlug ? productIdBySlug.get(item.productSlug) ?? null : null,
-          name: item.name,
-          price: item.price,
-          quantity: item.quantity,
-          selectedColor: item.selectedColor,
-        })),
+  const subtotal: number = body.subtotal ?? 0;
+  const shippingCost: number = body.shipping?.cost ?? 0;
+
+  // The discount is never trusted from the client — re-derive it here from
+  // the coupon's own rules so a tampered client-side amount can't apply.
+  const couponCode: string | undefined = body.couponCode?.trim().toUpperCase();
+  let discountAmount = 0;
+  let coupon: Awaited<ReturnType<typeof prisma.coupon.findUnique>> = null;
+
+  if (couponCode) {
+    coupon = await prisma.coupon.findUnique({ where: { code: couponCode } });
+    if (!coupon) {
+      return NextResponse.json({ error: "Invalid coupon code." }, { status: 400 });
+    }
+    const redemptionError = getCouponRedemptionError(coupon, subtotal);
+    if (redemptionError) {
+      return NextResponse.json({ error: redemptionError }, { status: 400 });
+    }
+    discountAmount = computeCouponDiscount(coupon, subtotal);
+  }
+
+  const total = subtotal + shippingCost - discountAmount;
+
+  const order = await prisma.$transaction(async (tx) => {
+    if (coupon) {
+      await tx.coupon.update({
+        where: { id: coupon.id },
+        data: { timesRedeemed: { increment: 1 } },
+      });
+    }
+
+    return tx.order.create({
+      data: {
+        orderNumber: generateOrderNumber(),
+        customerFullName: fullName,
+        customerPhone: phone,
+        deliveryRegion: region,
+        deliveryAddress: body.delivery?.address ?? "",
+        deliveryProvince: body.delivery?.province ?? null,
+        deliveryDistrict: body.delivery?.district ?? null,
+        deliveryLat: body.delivery?.coords?.lat ?? null,
+        deliveryLng: body.delivery?.coords?.lng ?? null,
+        shippingMethod: body.shipping?.method ?? "",
+        shippingCost,
+        paymentMethod: body.paymentMethod ?? "",
+        subtotal,
+        total,
+        couponCode: coupon ? coupon.code : null,
+        discountAmount,
+        items: {
+          create: items.map((item) => ({
+            productId: item.productSlug ? productIdBySlug.get(item.productSlug) ?? null : null,
+            name: item.name,
+            price: item.price,
+            quantity: item.quantity,
+            selectedColor: item.selectedColor,
+          })),
+        },
       },
-    },
+    });
   });
 
   return NextResponse.json({ orderNumber: order.orderNumber, id: order.id });
