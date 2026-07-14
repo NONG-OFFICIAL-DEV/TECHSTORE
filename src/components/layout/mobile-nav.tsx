@@ -75,12 +75,12 @@ export function MobileNav() {
                   />
                   {/* FIXED: added isMounted safety check to eliminate hydration warnings */}
                   {item.href === "/cart" && isMounted && totalItems > 0 && (
-                    <span className="absolute -right-2 -top-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[9px] font-mono font-medium text-primary-foreground">
+                    <span className="absolute -right-2 -top-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[9px] font-medium text-primary-foreground">
                       {totalItems > 9 ? "9+" : totalItems}
                     </span>
                   )}
                   {item.href === "/wishlist" && isMounted && wishlistCount > 0 && (
-                    <span className="absolute -right-2 -top-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[9px] font-mono font-medium text-primary-foreground">
+                    <span className="absolute -right-2 -top-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[9px] font-medium text-primary-foreground">
                       {wishlistCount > 9 ? "9+" : wishlistCount}
                     </span>
                   )}

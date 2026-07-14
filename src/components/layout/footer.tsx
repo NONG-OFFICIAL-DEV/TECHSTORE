@@ -122,7 +122,7 @@ export function Footer() {
                   key={s.name}
                   href={s.href}
                   aria-label={s.name}
-                  className="flex h-8 w-8 items-center justify-center rounded-md border border-border font-mono text-[10px] font-medium text-muted-foreground transition-colors hover:border-primary/50 hover:text-primary"
+                  className="flex h-8 w-8 items-center justify-center rounded-md border border-border text-[10px] font-medium text-muted-foreground transition-colors hover:border-primary/50 hover:text-primary"
                 >
                   {s.label}
                 </Link>

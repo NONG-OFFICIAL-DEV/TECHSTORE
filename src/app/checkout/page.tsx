@@ -267,7 +267,7 @@ export default function CheckoutPage() {
         </div>
         <h1 className="text-2xl font-bold">{t("checkout.orderPlacedTitle")}</h1>
         {orderNumber && (
-          <p className="mt-4 rounded-lg border border-border/60 bg-card/40 px-4 py-2 font-mono text-sm font-semibold text-foreground">
+          <p className="mt-4 rounded-lg border border-border/60 bg-card/40 px-4 py-2 text-sm font-semibold text-foreground">
             {t("checkout.orderNumberLabel", { number: orderNumber })}
           </p>
         )}
@@ -620,7 +620,7 @@ export default function CheckoutPage() {
                     {paymentMethod === "khqr" ? (
                       <>
                         <div className="bg-white p-3 rounded-xl border mb-3 shadow-sm">
-                          <div className="w-36 h-36 sm:w-40 sm:h-40 bg-gradient-to-br from-red-500 to-red-700 flex items-center justify-center text-white rounded-lg font-mono font-bold text-lg">
+                          <div className="w-36 h-36 sm:w-40 sm:h-40 bg-gradient-to-br from-red-500 to-red-700 flex items-center justify-center text-white rounded-lg font-bold text-lg">
                             KHQR DUMMY
                           </div>
                         </div>
