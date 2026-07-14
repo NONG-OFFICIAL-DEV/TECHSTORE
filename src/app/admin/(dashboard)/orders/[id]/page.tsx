@@ -1,9 +1,18 @@
 import { notFound } from "next/navigation";
+import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { toAdminOrderDTO } from "@/lib/serializers";
 import { formatPrice } from "@/lib/utils";
 import { OrderStatusSelect } from "@/components/admin/order-status-select";
 import { AutoRefresh } from "@/components/admin/auto-refresh";
+import {
+  Breadcrumb,
+  BreadcrumbList,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb";
 
 export const dynamic = "force-dynamic";
 
@@ -20,9 +29,22 @@ export default async function AdminOrderDetailPage({ params }: OrderDetailPagePr
 
   return (
     <div className="max-w-4xl">
-      <div className="flex items-center justify-between">
+      <Breadcrumb>
+        <BreadcrumbList>
+          <BreadcrumbItem>
+            <BreadcrumbLink asChild>
+              <Link href="/admin/orders">Orders</Link>
+            </BreadcrumbLink>
+          </BreadcrumbItem>
+          <BreadcrumbSeparator />
+          <BreadcrumbItem>
+            <BreadcrumbPage>{dto.orderNumber}</BreadcrumbPage>
+          </BreadcrumbItem>
+        </BreadcrumbList>
+      </Breadcrumb>
+      <div className="mt-3 flex items-center justify-between">
         <div>
-          <h1 className="text-xl font-semibold">{dto.orderNumber}</h1>
+          <h1 className="text-xl font-semibold">Order detail</h1>
           <p className="mt-1 text-sm text-muted-foreground">
             Placed{" "}
             {new Date(dto.createdAt).toLocaleString("en-US", {
