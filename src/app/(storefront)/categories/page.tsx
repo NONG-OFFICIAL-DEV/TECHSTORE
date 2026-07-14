@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { getCategories } from "@/lib/data/categories";
+import { getCategoriesSafe } from "@/lib/data/categories";
 import { CategoriesContent } from "./categories-content";
 
 export const dynamic = "force-dynamic";
@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 };
 
 export default async function CategoriesPage() {
-  const categories = await getCategories();
+  const categories = await getCategoriesSafe();
 
   return <CategoriesContent categories={categories} />;
 }
