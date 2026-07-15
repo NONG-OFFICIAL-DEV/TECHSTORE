@@ -17,10 +17,16 @@ export interface RevenueTrendPoint {
   orders: number;
 }
 
-export function RevenueChart({ data }: { data: RevenueTrendPoint[] }) {
+export function RevenueChart({
+  data,
+  title = "Revenue — last 30 days",
+}: {
+  data: RevenueTrendPoint[];
+  title?: string;
+}) {
   return (
     <div className="rounded-2xl border border-border bg-card p-5 shadow-sm">
-      <span className="text-sm font-medium text-muted-foreground">Revenue — last 30 days</span>
+      <span className="text-sm font-medium text-muted-foreground">{title}</span>
       <div className="mt-4 h-64">
         <ResponsiveContainer width="100%" height="100%">
           <LineChart data={data} margin={{ top: 5, right: 8, left: 0, bottom: 0 }}>
