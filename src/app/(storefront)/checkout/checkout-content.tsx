@@ -354,8 +354,8 @@ export function CheckoutContent({ shippingMethods }: CheckoutContentProps) {
         title={t("checkout.title")}
       />
 
-      <div className="grid lg:grid-cols-12 gap-8 lg:gap-12 items-start">
-        <form onSubmit={handleSubmitOrder} className="lg:col-span-7 flex flex-col gap-6">
+      <div className="grid grid-cols-1 gap-8 lg:grid-cols-12 lg:gap-12 items-start">
+        <form onSubmit={handleSubmitOrder} className="min-w-0 lg:col-span-7 flex flex-col gap-6">
           <StepIndicator current={step} />
 
           <AnimatePresence mode="wait" custom={direction}>
@@ -720,7 +720,7 @@ export function CheckoutContent({ shippingMethods }: CheckoutContentProps) {
         </form>
 
         {/* Sticky Review Panel */}
-        <div className="lg:col-span-5 lg:sticky lg:top-24 flex flex-col gap-4">
+        <div className="min-w-0 lg:col-span-5 lg:sticky lg:top-24 flex flex-col gap-4">
           <div className="rounded-2xl border border-border/60 bg-card/40 backdrop-blur-sm p-6">
             <h2 className="text-lg font-semibold mb-4">{t("checkout.reviewItems")}</h2>
 
