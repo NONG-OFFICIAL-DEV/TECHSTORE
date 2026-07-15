@@ -56,7 +56,7 @@ export default function AdminLoginPage() {
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           <div>
             <label htmlFor="email" className="text-xs font-medium text-muted-foreground">
-              Email
+              Email <span className="text-destructive">*</span>
             </label>
             <Input
               id="email"
@@ -72,7 +72,7 @@ export default function AdminLoginPage() {
 
           <div>
             <label htmlFor="password" className="text-xs font-medium text-muted-foreground">
-              Password
+              Password <span className="text-destructive">*</span>
             </label>
             <Input
               id="password"

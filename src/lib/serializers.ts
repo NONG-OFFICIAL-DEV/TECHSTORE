@@ -4,6 +4,7 @@ import type {
   Order as OrderModel,
   OrderItem as OrderItemModel,
   Coupon as CouponModel,
+  ShippingMethod as ShippingMethodModel,
 } from "../../generated/prisma/client";
 import type { Category, Product } from "@/types/product";
 
@@ -170,6 +171,28 @@ export function toCouponDTO(coupon: CouponModel): CouponDTO {
     maxRedemptions: coupon.maxRedemptions,
     timesRedeemed: coupon.timesRedeemed,
     createdAt: coupon.createdAt.toISOString(),
+  };
+}
+
+export interface ShippingMethodDTO {
+  id: string;
+  name: string;
+  description: string;
+  region: ShippingMethodModel["region"];
+  cost: number;
+  isActive: boolean;
+  sortOrder: number;
+}
+
+export function toShippingMethodDTO(method: ShippingMethodModel): ShippingMethodDTO {
+  return {
+    id: method.id,
+    name: method.name,
+    description: method.description,
+    region: method.region,
+    cost: toNumber(method.cost),
+    isActive: method.isActive,
+    sortOrder: method.sortOrder,
   };
 }
 

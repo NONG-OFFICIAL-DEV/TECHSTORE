@@ -164,6 +164,27 @@ model OrderItem {
 }
 
 // ---------------------------------------------------------------------------
+// Shipping
+// ---------------------------------------------------------------------------
+
+model ShippingMethod {
+  id          String         @id @default(cuid())
+  name        String
+  description String
+  region      DeliveryRegion
+  cost        Decimal        @db.Decimal(10, 2)
+  isActive    Boolean        @default(true)
+  // Display order within a region's courier list on checkout.
+  sortOrder   Int            @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([region])
+  @@map("shipping_methods")
+}
+
+// ---------------------------------------------------------------------------
 // Coupons
 // ---------------------------------------------------------------------------
 

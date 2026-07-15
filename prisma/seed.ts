@@ -101,6 +101,57 @@ async function seedProducts(categoryIdBySlug: Map<string, string>) {
   }
 }
 
+// Matches the couriers that used to be hardcoded in checkout/page.tsx.
+// No unique constraint on [name, region] in the DB, so this finds-then-
+// writes instead of using Prisma's upsert (which needs one).
+const DEFAULT_SHIPPING_METHODS = [
+  {
+    name: "Grab Express",
+    description: "Instant bike delivery within PP",
+    region: "PHNOM_PENH" as const,
+    cost: 2.5,
+    sortOrder: 0,
+  },
+  {
+    name: "J&T Express (Phnom Penh)",
+    description: "Next day delivery",
+    region: "PHNOM_PENH" as const,
+    cost: 1.5,
+    sortOrder: 1,
+  },
+  {
+    name: "Vireak Buntham (VET)",
+    description: "1-2 days to bus station/home",
+    region: "PROVINCE" as const,
+    cost: 3.0,
+    sortOrder: 0,
+  },
+  {
+    name: "J&T Express (Province)",
+    description: "1-3 days to doorstep",
+    region: "PROVINCE" as const,
+    cost: 2.5,
+    sortOrder: 1,
+  },
+];
+
+async function seedShippingMethods() {
+  for (const method of DEFAULT_SHIPPING_METHODS) {
+    const existing = await prisma.shippingMethod.findFirst({
+      where: { name: method.name, region: method.region },
+    });
+
+    if (existing) {
+      await prisma.shippingMethod.update({
+        where: { id: existing.id },
+        data: method,
+      });
+    } else {
+      await prisma.shippingMethod.create({ data: method });
+    }
+  }
+}
+
 async function seedAdminUser() {
   const email = process.env.ADMIN_EMAIL;
   const password = process.env.ADMIN_PASSWORD;
@@ -124,6 +175,7 @@ async function seedAdminUser() {
 async function main() {
   const categoryIdBySlug = await seedCategories();
   await seedProducts(categoryIdBySlug);
+  await seedShippingMethods();
   await seedAdminUser();
 }
 

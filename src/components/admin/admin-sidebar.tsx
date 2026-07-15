@@ -3,7 +3,7 @@
 import * as React from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { LayoutGrid, Package, Tags, ShoppingCart, Ticket, Users, LogOut } from "lucide-react";
+import { LayoutGrid, Package, Tags, ShoppingCart, Ticket, Truck, Users, LogOut } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const NAV_GROUPS = [
@@ -24,6 +24,12 @@ const NAV_GROUPS = [
       { href: "/admin/orders", label: "Orders", icon: ShoppingCart, exact: false },
       { href: "/admin/coupons", label: "Coupons", icon: Ticket, exact: false },
       { href: "/admin/customers", label: "Customers", icon: Users, exact: false },
+    ],
+  },
+  {
+    label: "Shipping",
+    items: [
+      { href: "/admin/shipping-methods", label: "Shipping", icon: Truck, exact: false }
     ],
   },
 ] as const;
