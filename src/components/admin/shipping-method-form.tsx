@@ -6,6 +6,7 @@ import { AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Spinner } from "@/components/ui/spinner";
 import {
   Select,
   SelectTrigger,
@@ -165,6 +166,7 @@ export function ShippingMethodForm({ method }: ShippingMethodFormProps) {
           Cancel
         </Button>
         <Button type="submit" disabled={isSubmitting} className="flex-1">
+          {isSubmitting && <Spinner />}
           {isSubmitting ? "Saving..." : isEdit ? "Save changes" : "Create shipping method"}
         </Button>
       </div>

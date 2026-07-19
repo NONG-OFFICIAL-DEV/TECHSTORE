@@ -4,6 +4,7 @@ import * as React from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { LayoutGrid, Package, Tags, ShoppingCart, Ticket, Truck, Users, BarChart3, LogOut } from "lucide-react";
+import { Spinner } from "@/components/ui/spinner";
 import { cn } from "@/lib/utils";
 
 const NAV_GROUPS = [
@@ -103,7 +104,7 @@ export function AdminSidebar({ adminEmail }: { adminEmail: string }) {
           disabled={isLoggingOut}
           className="mt-2 flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-surface-hover hover:text-foreground disabled:opacity-50"
         >
-          <LogOut className="h-4 w-4" />
+          {isLoggingOut ? <Spinner className="h-4 w-4" /> : <LogOut className="h-4 w-4" />}
           {isLoggingOut ? "Signing out..." : "Sign out"}
         </button>
       </div>

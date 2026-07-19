@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Spinner } from "@/components/ui/spinner";
 import { slugify } from "@/lib/utils";
 import type { Category } from "@/types/product";
 
@@ -173,6 +174,7 @@ export function CategoryForm({ category }: CategoryFormProps) {
           Cancel
         </Button>
         <Button type="submit" disabled={isSubmitting} className="flex-1">
+          {isSubmitting && <Spinner />}
           {isSubmitting ? "Saving..." : isEdit ? "Save changes" : "Create category"}
         </Button>
       </div>

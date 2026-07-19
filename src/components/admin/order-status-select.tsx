@@ -10,6 +10,8 @@ import {
   SelectContent,
   SelectItem,
 } from "@/components/ui/select";
+import { Spinner } from "@/components/ui/spinner";
+import { cn } from "@/lib/utils";
 import type { OrderStatus } from "@/lib/prisma";
 
 const STATUS_OPTIONS: OrderStatus[] = [
@@ -56,18 +58,21 @@ export function OrderStatusSelect({
   };
 
   const select = (
-    <Select value={status} onValueChange={handleChange} disabled={isSaving}>
-      <SelectTrigger className={compact ? "h-8 w-40 text-xs" : "mt-1"}>
-        <SelectValue>{STATUS_LABELS[status]}</SelectValue>
-      </SelectTrigger>
-      <SelectContent>
-        {STATUS_OPTIONS.map((option) => (
-          <SelectItem key={option} value={option}>
-            {STATUS_LABELS[option]}
-          </SelectItem>
-        ))}
-      </SelectContent>
-    </Select>
+    <div className={cn("flex items-center gap-2", compact ? "" : "mt-1")}>
+      <Select value={status} onValueChange={handleChange} disabled={isSaving}>
+        <SelectTrigger className={compact ? "h-8 w-40 text-xs" : ""}>
+          <SelectValue>{STATUS_LABELS[status]}</SelectValue>
+        </SelectTrigger>
+        <SelectContent>
+          {STATUS_OPTIONS.map((option) => (
+            <SelectItem key={option} value={option}>
+              {STATUS_LABELS[option]}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+      {isSaving && <Spinner className="text-muted-foreground" />}
+    </div>
   );
 
   if (compact) {

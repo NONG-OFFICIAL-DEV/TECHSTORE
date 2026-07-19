@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { DatePicker } from "@/components/ui/date-picker";
+import { Spinner } from "@/components/ui/spinner";
 import {
   Select,
   SelectTrigger,
@@ -196,6 +197,7 @@ export function CouponForm({ coupon }: CouponFormProps) {
           Cancel
         </Button>
         <Button type="submit" disabled={isSubmitting} className="flex-1">
+          {isSubmitting && <Spinner />}
           {isSubmitting ? "Saving..." : isEdit ? "Save changes" : "Create coupon"}
         </Button>
       </div>

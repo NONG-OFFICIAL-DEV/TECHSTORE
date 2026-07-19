@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { DatePicker } from "@/components/ui/date-picker";
+import { Spinner } from "@/components/ui/spinner";
 import type { OrderStatus } from "@/lib/prisma";
 
 export function OrderTrackingForm({
@@ -81,6 +82,7 @@ export function OrderTrackingForm({
       </div>
       {error && <p className="text-xs text-destructive">{error}</p>}
       <Button type="submit" size="sm" disabled={isSaving}>
+        {isSaving && <Spinner />}
         {isSaving ? "Saving..." : "Save tracking info"}
       </Button>
     </form>

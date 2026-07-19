@@ -4,6 +4,7 @@ import * as React from "react";
 import { useRouter } from "next/navigation";
 import { Trash2 } from "lucide-react";
 import { toast } from "sonner";
+import { Spinner } from "@/components/ui/spinner";
 import {
   AlertDialog,
   AlertDialogTrigger,
@@ -76,6 +77,7 @@ export function DeleteConfirmButton({ itemName, itemLabel, onDelete }: DeleteCon
             }}
             disabled={isDeleting}
           >
+            {isDeleting && <Spinner className="mr-1.5" />}
             {isDeleting ? "Deleting..." : "Delete"}
           </AlertDialogAction>
         </AlertDialogFooter>
