@@ -1,13 +1,12 @@
 "use client";
 
-import { getFeaturedProducts } from "@/data/products";
+import type { Product } from "@/types/product";
 import { ProductCard } from "@/components/product/product-card";
 import { SectionHeading } from "@/components/shared/section-heading";
 import { useLanguage } from "@/providers/language-provider";
 
-export function FeaturedProducts() {
+export function FeaturedProducts({ featured }: { featured: Product[] }) {
   const { t } = useLanguage();
-  const featured = getFeaturedProducts();
 
   return (
     <section className="mx-auto max-w-7xl px-6 md:px-8 py-4 md:py-4">

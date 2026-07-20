@@ -2,8 +2,7 @@
 
 import { useState, useMemo } from "react";
 import { useSearchParams } from "next/navigation";
-import { products } from "@/data/products";
-import { Category, SortOption } from "@/types/product";
+import { Category, Product, SortOption } from "@/types/product";
 import { ProductGrid } from "@/components/product/product-grid";
 import { SearchBar } from "@/components/product/search-bar";
 import { CategoryFilter } from "@/components/product/category-filter";
@@ -15,7 +14,13 @@ import { useLanguage } from "@/providers/language-provider";
 
 const PAGE_SIZE = 8;
 
-export function ProductsContent({ categories }: { categories: Category[] }) {
+export function ProductsContent({
+  categories,
+  products,
+}: {
+  categories: Category[];
+  products: Product[];
+}) {
   const { t } = useLanguage();
   const searchParams = useSearchParams();
   const initialCategory = searchParams.get("category") ?? undefined;
@@ -62,7 +67,7 @@ export function ProductsContent({ categories }: { categories: Category[] }) {
     }
 
     return result;
-  }, [search, category, sort]);
+  }, [products, search, category, sort]);
 
   const totalPages = Math.ceil(filtered.length / PAGE_SIZE);
   const paginated = filtered.slice(

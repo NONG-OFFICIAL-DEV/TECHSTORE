@@ -50,6 +50,13 @@ export function validateProductInput(
   if (!Array.isArray(b.features)) return { error: "Features must be an array." };
   if (!Array.isArray(b.tags)) return { error: "Tags must be an array." };
   if (typeof b.inStock !== "boolean") return { error: "inStock must be a boolean." };
+  if (
+    b.stockCount !== null &&
+    b.stockCount !== undefined &&
+    (typeof b.stockCount !== "number" || !Number.isInteger(b.stockCount) || b.stockCount < 0)
+  ) {
+    return { error: "Stock count must be a non-negative whole number." };
+  }
 
   return {
     data: {

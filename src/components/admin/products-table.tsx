@@ -5,8 +5,8 @@ import { ColumnDef } from "@tanstack/react-table";
 import { DataTable } from "@/components/ui/data-table";
 import { AdminThumbnail } from "@/components/admin/admin-thumbnail";
 import { DeleteConfirmButton } from "@/components/admin/delete-confirm-button";
+import { StockQuickEdit } from "@/components/admin/stock-quick-edit";
 import { formatPrice } from "@/lib/utils";
-import { LOW_STOCK_THRESHOLD } from "@/lib/constants";
 import type { AdminProduct } from "@/lib/serializers";
 
 const columns: ColumnDef<AdminProduct>[] = [
@@ -45,24 +45,12 @@ const columns: ColumnDef<AdminProduct>[] = [
     header: "Stock",
     cell: ({ row }) => {
       const product = row.original;
-      if (!product.inStock) {
-        return (
-          <span className="rounded-full bg-destructive/10 px-2 py-0.5 text-xs font-medium text-destructive">
-            Out of stock
-          </span>
-        );
-      }
-      const isLowStock =
-        product.stockCount != null && product.stockCount <= LOW_STOCK_THRESHOLD;
       return (
-        <span className="flex items-center gap-2">
-          <span className="text-muted-foreground">{product.stockCount ?? "—"}</span>
-          {isLowStock && (
-            <span className="rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary">
-              Low stock
-            </span>
-          )}
-        </span>
+        <StockQuickEdit
+          productId={product.id}
+          stockCount={product.stockCount ?? null}
+          inStock={product.inStock}
+        />
       );
     },
   },

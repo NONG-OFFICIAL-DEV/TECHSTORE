@@ -4,17 +4,21 @@ import { Categories } from "@/components/home/categories";
 import { Testimonials } from "@/components/home/testimonials";
 import { CtaSection } from "@/components/home/cta-section";
 import { getCategoriesSafe } from "@/lib/data/categories";
+import { getFeaturedProductsSafe } from "@/lib/data/products";
 
 export const dynamic = "force-dynamic";
 
 export default async function HomePage() {
-  const categories = await getCategoriesSafe();
+  const [categories, featured] = await Promise.all([
+    getCategoriesSafe(),
+    getFeaturedProductsSafe(),
+  ]);
 
   return (
     <>
       <Hero categories={categories} />
       <Categories categories={categories} />
-      <FeaturedProducts />
+      <FeaturedProducts featured={featured} />
       <Testimonials />
       <CtaSection />
     </>

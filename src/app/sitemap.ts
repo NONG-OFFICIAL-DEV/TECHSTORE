@@ -1,9 +1,11 @@
 import type { MetadataRoute } from "next";
-import { products } from "@/data/products";
+import { getProductsSafe } from "@/lib/data/products";
 
 const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
 
-export default function sitemap(): MetadataRoute.Sitemap {
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  const products = await getProductsSafe();
+
   const staticRoutes: MetadataRoute.Sitemap = [
     { url: `${BASE_URL}/`, changeFrequency: "weekly", priority: 1 },
     { url: `${BASE_URL}/products`, changeFrequency: "daily", priority: 0.9 },

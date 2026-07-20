@@ -2,33 +2,43 @@
 
 import * as React from "react";
 import { useRouter } from "next/navigation";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Controller, useForm } from "react-hook-form";
+import * as z from "zod";
 import { AlertCircle, LockKeyhole } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Field, FieldError, FieldLabel } from "@/components/ui/field";
+
+const formSchema = z.object({
+  email: z.string().trim().min(1, "Email is required.").email("Enter a valid email address."),
+  password: z.string().min(1, "Password is required."),
+});
+
+type FormValues = z.infer<typeof formSchema>;
 
 export default function AdminLoginPage() {
   const router = useRouter();
-  const [email, setEmail] = React.useState("");
-  const [password, setPassword] = React.useState("");
   const [error, setError] = React.useState<string | null>(null);
-  const [isSubmitting, setIsSubmitting] = React.useState(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsSubmitting(true);
+  const form = useForm<FormValues>({
+    resolver: zodResolver(formSchema),
+    defaultValues: { email: "", password: "" },
+  });
+
+  const onSubmit = async (data: FormValues) => {
     setError(null);
 
     try {
       const response = await fetch("/api/admin/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify(data),
       });
 
       if (!response.ok) {
-        const data = await response.json().catch(() => null);
-        setError(data?.error ?? "Something went wrong. Please try again.");
-        setIsSubmitting(false);
+        const body = await response.json().catch(() => null);
+        setError(body?.error ?? "Something went wrong. Please try again.");
         return;
       }
 
@@ -36,9 +46,10 @@ export default function AdminLoginPage() {
       router.refresh();
     } catch {
       setError("Something went wrong. Please try again.");
-      setIsSubmitting(false);
     }
   };
+
+  const isSubmitting = form.formState.isSubmitting;
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
@@ -53,38 +64,48 @@ export default function AdminLoginPage() {
           </p>
         </div>
 
-        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-          <div>
-            <label htmlFor="email" className="text-xs font-medium text-muted-foreground">
-              Email <span className="text-destructive">*</span>
-            </label>
-            <Input
-              id="email"
-              type="email"
-              autoComplete="username"
-              required
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="admin@techstore.local"
-              className="mt-1"
-            />
-          </div>
+        <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-4">
+          <Controller
+            name="email"
+            control={form.control}
+            render={({ field, fieldState }) => (
+              <Field data-invalid={fieldState.invalid} className="gap-1.5">
+                <FieldLabel htmlFor="email" className="text-xs font-medium text-muted-foreground">
+                  Email <span className="text-destructive">*</span>
+                </FieldLabel>
+                <Input
+                  {...field}
+                  id="email"
+                  type="email"
+                  autoComplete="username"
+                  placeholder="admin@techstore.local"
+                  aria-invalid={fieldState.invalid}
+                />
+                {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+              </Field>
+            )}
+          />
 
-          <div>
-            <label htmlFor="password" className="text-xs font-medium text-muted-foreground">
-              Password <span className="text-destructive">*</span>
-            </label>
-            <Input
-              id="password"
-              type="password"
-              autoComplete="current-password"
-              required
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="••••••••"
-              className="mt-1"
-            />
-          </div>
+          <Controller
+            name="password"
+            control={form.control}
+            render={({ field, fieldState }) => (
+              <Field data-invalid={fieldState.invalid} className="gap-1.5">
+                <FieldLabel htmlFor="password" className="text-xs font-medium text-muted-foreground">
+                  Password <span className="text-destructive">*</span>
+                </FieldLabel>
+                <Input
+                  {...field}
+                  id="password"
+                  type="password"
+                  autoComplete="current-password"
+                  placeholder="••••••••"
+                  aria-invalid={fieldState.invalid}
+                />
+                {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+              </Field>
+            )}
+          />
 
           {error && (
             <div
